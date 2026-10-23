@@ -40,4 +40,15 @@ This folder contains the papers used in the M1 literature review. They are inclu
 - Public paper page: <https://aclanthology.org/2025.findings-acl.661/>
 - File: `04-confit-v2-resume-job-matching.pdf`
 
+
+## 5. Calibrated Resume-Job Matching
+
+- Full title: Calibrated Resume-Job Matching for Trustworthy LLM-Assisted Recruiter Screening: Pairwise Matching, Probability Calibration, and Selective Refusal on Two Public Recruitment Datasets
+- Authors: Binghua Zhou, Jiaying Jin, and David Zhao
+- Venue: Journal of Technology Informatics and Engineering, Volume 4, Number 3, 2025
+- Pages: 625-648
+- DOI: <https://doi.org/10.51903/jtie.v4i3.529>
+- Article page: <https://jtie.stekom.ac.id/index.php/jtie/article/view/529>
+- File: `05-calibrated-resume-job-matching.pdf`
+
 The original titles, authors, publication details, and links are listed above. Copyright remains with the respective authors and publishers.
