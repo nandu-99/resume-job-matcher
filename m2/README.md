@@ -42,7 +42,7 @@ The complete M2 work will be developed in one Google Colab notebook:
 notebooks/m2-baseline-reproduction.ipynb
 ```
 
-The notebook contains the dataset audit, text preprocessing, and reproducible data splits. Baseline models, evaluation, and reproduction observations will be added to the same notebook.
+The notebook contains the dataset audit, text preprocessing, reproducible data splits, TF-IDF cosine similarity, and paired TF-IDF with SGD. Detailed evaluation and reproduction observations will be added to the same notebook.
 
 ## Current Files
 
