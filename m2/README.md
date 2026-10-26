@@ -7,11 +7,7 @@ This milestone reproduces two baseline methods for three-class resume-job matchi
 1. TF-IDF with cosine similarity
 2. Paired TF-IDF with an SGD classifier
 
-The three output labels are:
-
-- Good Fit
-- Potential Fit
-- No Fit
+The output labels are Good Fit, Potential Fit, and No Fit. Macro-F1 is the main metric.
 
 ## Anchor Paper
 
@@ -25,51 +21,58 @@ The project uses the public `resume-job-description-fit` dataset:
 
 <https://huggingface.co/datasets/cnamuangtoun/resume-job-description-fit>
 
-The original dataset contains 8,000 resume-job pairs:
-
-| Split | Rows |
-|---|---:|
-| Training | 6,241 |
-| Test | 1,759 |
-
-Detailed findings are recorded in [dataset-documentation.md](dataset-documentation.md).
+The original dataset contains 6,241 training rows and 1,759 official test rows. After duplicate cleaning, 6,228 training rows remain. They are divided into 4,982 training rows and 1,246 validation rows with stratification and random seed 42.
 
 ## Main Notebook
 
-The complete M2 work will be developed in one Google Colab notebook:
+All executable work is in one Google Colab notebook:
 
 ```text
 notebooks/m2-baseline-reproduction.ipynb
 ```
 
-The notebook contains the dataset audit, text preprocessing, reproducible data splits, TF-IDF cosine similarity, and paired TF-IDF with SGD. Detailed evaluation and reproduction observations will be added to the same notebook.
+The notebook contains dataset checks, preprocessing, reproducible splits, both baseline models, detailed evaluation, graphs, and reproduction observations.
 
-## Current Files
+## Final Test Results
+
+| Model | Paper macro-F1 | Reproduced macro-F1 | Accuracy | Weighted F1 |
+|---|---:|---:|---:|---:|
+| TF-IDF cosine similarity | 0.359 | 0.3708 | 0.4110 | 0.4132 |
+| Paired TF-IDF with SGD | 0.436 | 0.4100 | 0.5088 | 0.4671 |
+
+## Files
 
 ```text
 m2/
 |-- README.md
 |-- dataset-documentation.md
+|-- preprocessing.md
+|-- reproduction-observations.md
+|-- reproduction-results.md
 |-- requirements.txt
 |-- figures/
-|   `-- dataset-overview.png
+|   |-- confusion-matrices.png
+|   |-- dataset-overview.png
+|   |-- result-comparison.png
+|   |-- split-label-distribution.png
+|   `-- threshold-selection.png
 `-- notebooks/
     `-- m2-baseline-reproduction.ipynb
 ```
 
-## Paper Results to Reproduce
+## Documentation
 
-| Model | Paper test macro-F1 |
-|---|---:|
-| TF-IDF cosine similarity | 0.359 |
-| Paired TF-IDF with SGD | 0.436 |
+- [Dataset documentation](dataset-documentation.md)
+- [Preprocessing and data splits](preprocessing.md)
+- [Reproduction results](reproduction-results.md)
+- [Reproduction observations](reproduction-observations.md)
 
-Macro-F1 is the main metric because the No Fit class is larger than the other two classes.
-
-## Colab Instructions
+## Run in Colab
 
 1. Open the notebook in Google Colab.
 2. Use the default CPU runtime.
-3. Run the cells from the beginning in their given order.
-4. Keep random seed 42 for all data splits and models.
-5. Use the official test split only for final evaluation.
+3. Run every cell from the beginning in order.
+4. Keep random seed 42.
+5. Confirm that every final check passes.
+
+The official test split must not be used for training, threshold selection, or model setting selection.
