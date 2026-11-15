@@ -1,8 +1,8 @@
-# Anchor Paper Justification
+# Baseline Reference and Rationale
 
 ## Selected Paper
 
-Our anchor paper is:
+The reference paper for our baseline methods is:
 
 > B. Zhou, J. Jin, and D. Zhao, "Calibrated Resume-Job Matching for Trustworthy LLM-Assisted Recruiter Screening: Pairwise Matching, Probability Calibration, and Selective Refusal on Two Public Recruitment Datasets," *Journal of Technology Informatics and Engineering*, vol. 4, no. 3, pp. 625-648, 2025.
 
@@ -26,23 +26,16 @@ We selected this paper because it gives the best practical base for our project.
 
 Main dataset: <https://huggingface.co/datasets/cnamuangtoun/resume-job-description-fit>
 
-## What We Will Reproduce in M2
+## Methods taken as references
 
-We will reproduce two three-class methods from the paper:
+The paper provides two useful starting points for three-class matching:
 
-1. TF-IDF with cosine similarity
-2. Paired TF-IDF with an SGD classifier using logistic loss
-
-The main reproduction target is the paired TF-IDF with SGD model.
-
-Reported target results:
-
-| Method | Test macro-F1 |
+| Method | Paper-reported test macro-F1 |
 |---|---:|
-| TF-IDF cosine similarity | 0.359 |
-| Paired TF-IDF with SGD | 0.436 |
+| TF-IDF with cosine similarity | 0.359 |
+| Paired TF-IDF with SGD using logistic loss | 0.436 |
 
-We will use the official test split only for final evaluation. Model settings and thresholds will be selected with the validation split.
+Its public dataset and documented preparation steps connect the literature review to our data pipeline. Baseline implementation and candidate comparison support model development. Thresholds and settings must be selected with validation data, with the official test set reserved for evaluation.
 
 ## Why We Did Not Select the Other Papers
 
@@ -64,10 +57,10 @@ It is a strong and recent paper, but its datasets are unavailable, its main task
 
 ## Scientific Value and Practical Limit
 
-The other four papers are useful for understanding stronger semantic and ranking methods. The selected anchor paper is from a less established venue than RecSys or ACL Findings, so we will not treat it as the strongest paper in the field. We selected it because its task, public data, reported settings, and compute needs fit our M2 work.
+The other four papers are useful for understanding stronger semantic and ranking methods. The selected anchor paper is from a less established venue than RecSys or ACL Findings, so we will not treat it as the strongest paper in the field. We selected it because its task, public data, reported settings, and compute needs fit the practical needs of our project.
 
 The paper says its code and input files were archived, but it does not give a public archive link. Also, the complete skill list and title rules are missing. We can reproduce the paired TF-IDF with SGD baseline, but exact reproduction of the full title hybrid is uncertain.
 
-## Final Decision
+## Role in the project
 
-This paper is the most suitable anchor for a student reproduction project. It gives us a public dataset, a clear three-class baseline, a measurable target, and a method that can run in Colab. It also supports a later controlled experiment on semantic matching.
+This paper offers a practical reference for an Industry Track solution: a relevant dataset, three clear labels, reported baseline settings, and manageable CPU requirements. The other papers broaden our view of semantic matching and ranking. Together, they guide implementation choices without changing the project's focus on a recruiter support system.

@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+.cache/
+data/
+artifacts/
+*.joblib
+*.pkl

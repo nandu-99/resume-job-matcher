@@ -1,78 +1,59 @@
-# M2: Baseline Reproduction
+# Data Understanding and Preparation
 
-## Project
+Industry Track - Resume-Job Matching System
 
-This milestone reproduces two baseline methods for three-class resume-job matching:
+The dataset contains resume text, job-description text, and a match label. The preparation pipeline studies data quality, removes inconsistent pairs, cleans text, and creates reproducible splits for model development.
 
-1. TF-IDF with cosine similarity
-2. Paired TF-IDF with an SGD classifier
+## Connection to existing work
 
-The output labels are Good Fit, Potential Fit, and No Fit. Macro-F1 is the main metric.
+The [initial paper review](../m1/related-work.md) guided the dataset and baseline choices. The selected reference uses the same three labels and provides preparation details that we can check. Our pipeline examines the actual records and documents the quality and split limits rather than assuming the published setup is sufficient for every recruitment scenario.
 
-## Anchor Paper
+## Data reports
 
-B. Zhou, J. Jin, and D. Zhao, "Calibrated Resume-Job Matching for Trustworthy LLM-Assisted Recruiter Screening: Pairwise Matching, Probability Calibration, and Selective Refusal on Two Public Recruitment Datasets," 2025.
+| File | Contents |
+|---|---|
+| [Data card](data-card.md) | Source, fields, labels, counts, intended use, and limits |
+| [Exploratory and statistical analysis](data-analysis.md) | Class balance, missing values, duplicates, document lengths, and overlap |
+| [Cleaning and split report](preprocessing.md) | Duplicate handling, text cleaning, split settings, and checks |
+| [Privacy report](privacy.md) | Personal data, handling rules, and responsible use |
+| [Preparation notebook](notebooks/m2-data-preparation.ipynb) | Executable code and aggregate results |
+| [Baseline notebook](notebooks/m2-baseline-reproduction.ipynb) | Existing model code, threshold selection, and saved results |
+| [Threshold selection](figures/threshold-selection.png) | Validation search for the cosine-similarity thresholds |
+| [Project presentation](presentation.pdf) | The original 10-slide presentation, with its content and design unchanged |
+| [Dataset overview](figures/dataset-overview.png) and [split distribution](figures/split-label-distribution.png) | Supporting figures |
 
-DOI: <https://doi.org/10.51903/jtie.v4i3.529>
+## Dataset and preparation
 
-## Dataset
+The original dataset has 8,000 labelled pairs, with no missing or empty required values. Good Fit and Potential Fit each account for 25% of the data; No Fit accounts for 50%.
 
-The project uses the public `resume-job-description-fit` dataset:
+The pipeline removes 12 rows with conflicting labels and one extra duplicate copy. The resulting splits contain 4,982 training rows, 1,246 validation rows, and 1,759 test rows. Neither original-text nor cleaned-text pairs are duplicated within a split or shared across splits.
 
-<https://huggingface.co/datasets/cnamuangtoun/resume-job-description-fit>
+The official test jobs are unseen, but most test resumes occur in the original training pool. Training and validation also share resumes and jobs. Job-grouped validation would better represent the new-job scenario during candidate selection. Dataset licence and collection details remain unresolved.
 
-The original dataset contains 6,241 training rows and 1,759 official test rows. After duplicate cleaning, 6,228 training rows remain. They are divided into 4,982 training rows and 1,246 validation rows with stratification and random seed 42.
+## Run the notebook
 
-## Main Notebook
+1. Open [m2-data-preparation.ipynb](notebooks/m2-data-preparation.ipynb) in Google Colab with a CPU runtime.
+2. Run every cell from the beginning. Internet access is required to download the dataset and install packages.
+3. Check that the validation tables pass and the counts match the reports. Investigate any differences before using the prepared data.
+4. Keep only aggregate outputs. Do not add real resume samples or dataset files to the repository.
 
-All executable work is in one Google Colab notebook:
+The preparation notebook specifies its tested package versions in its setup cell and prints the environment versions. [requirements.txt](requirements.txt) preserves the original baseline dependencies.
 
-```text
-notebooks/m2-baseline-reproduction.ipynb
-```
+## Baseline models
 
-The notebook contains dataset checks, preprocessing, reproducible splits, both baseline models, detailed evaluation, graphs, and reproduction observations.
+The [baseline notebook](notebooks/m2-baseline-reproduction.ipynb) retains the implementation from commit `229b0ff`. It uses the same three labels and fits text transformations and models on training data. Cosine thresholds are selected using validation data.
 
-## Final Test Results
+| Model | Saved test macro-F1 | Saved test accuracy |
+|---|---:|---:|
+| TF-IDF cosine similarity | 0.3708 | 0.4110 |
+| Paired TF-IDF with SGD | 0.4100 | 0.5088 |
 
-| Model | Paper macro-F1 | Reproduced macro-F1 | Accuracy | Weighted F1 |
-|---|---:|---:|---:|---:|
-| TF-IDF cosine similarity | 0.359 | 0.3708 | 0.4110 | 0.4132 |
-| Paired TF-IDF with SGD | 0.436 | 0.4100 | 0.5088 | 0.4671 |
+The baseline notebook is restored exactly as committed, including its code, setup cell, markdown, outputs, and original dataset preview. These are the original recorded results, not a new training run.
 
-## Files
+The baseline's recorded runtime was Python 3.13.16, with packages listed in [requirements.txt](requirements.txt). Its original setup cell installs `datasets` without pinning the full environment. To target the recorded results, install the listed versions in a separate runtime before running the notebook. Use a separate runtime for each notebook: the preparation notebook was verified with newer packages, including scikit-learn 1.8.0, while the original baseline used scikit-learn 1.6.1. Installing one environment over the other can change results.
 
-```text
-m2/
-|-- README.md
-|-- dataset-documentation.md
-|-- preprocessing.md
-|-- reproduction-observations.md
-|-- reproduction-results.md
-|-- requirements.txt
-|-- figures/
-|   |-- confusion-matrices.png
-|   |-- dataset-overview.png
-|   |-- result-comparison.png
-|   |-- split-label-distribution.png
-|   `-- threshold-selection.png
-`-- notebooks/
-    `-- m2-baseline-reproduction.ipynb
-```
+The files remain under `m2/` to preserve the existing project structure. For the Industry Track, data preparation supports M2; the baseline and candidate comparisons support M3. Candidate development can build on this implementation and record changes in an experiment log. The additional cleaned-pair assertions are in the preparation notebook; they have not been added to the historical baseline.
 
-## Documentation
+## Verification
 
-- [Dataset documentation](dataset-documentation.md)
-- [Preprocessing and data splits](preprocessing.md)
-- [Reproduction results](reproduction-results.md)
-- [Reproduction observations](reproduction-observations.md)
-
-## Run in Colab
-
-1. Open the notebook in Google Colab.
-2. Use the default CPU runtime.
-3. Run every cell from the beginning in order.
-4. Keep random seed 42.
-5. Confirm that every final check passes.
-
-The official test split must not be used for training, threshold selection, or model setting selection.
+The preparation code was run from the beginning on Python 3.14.0 using the installed package versions. All audit, preprocessing, and cleaned-pair checks passed. The preparation notebook contains the resulting aggregate outputs, and the dataset overview and split-distribution figures use that run. Package installation itself was not rerun during this verification. The baseline notebook was verified byte for byte against Git; its saved model results and threshold figure come from the earlier committed run.

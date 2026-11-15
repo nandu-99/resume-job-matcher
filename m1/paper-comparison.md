@@ -30,7 +30,7 @@ The calibrated matching paper uses `resume-job-description-fit`, which is public
 
 <https://huggingface.co/datasets/cnamuangtoun/resume-job-description-fit>
 
-This is the main reason it is practical for M2.
+This makes it a practical reference for our data preparation and baseline models.
 
 ### 3. Method Complexity
 
@@ -74,7 +74,7 @@ Macro-F1 is suitable for our three-class task because it gives equal importance 
 | ConFit v2 | Data is unavailable, the task is ranking, and the full method is expensive. |
 | Calibrated matching | Modest three-class result and incomplete access to code and hand-made resources. |
 
-## Selected Anchor Paper
+## Baseline Reference
 
 We selected **Calibrated Resume-Job Matching** as the anchor paper because it gives the best balance of:
 
@@ -86,16 +86,13 @@ We selected **Calibrated Resume-Job Matching** as the anchor paper because it gi
 - Low compute needs
 - A known result to reproduce
 
-The anchor choice is based on project fit and reproducibility. The stronger neural papers remain important for the literature review and for planning our later semantic experiment.
+The anchor choice is based on project fit and reproducibility. The neural papers provide useful candidate ideas for model development, subject to available data and compute.
 
-## Planned M2 Target
+## From the comparison to our approach
 
-We will reproduce:
+The review led us to a public three-class dataset and two CPU-friendly reference methods: TF-IDF cosine similarity and paired TF-IDF with SGD. Their reported test macro-F1 values are 0.359 and 0.436 respectively. These are results reported by the reference paper, not measurements from the preparation notebook.
 
-1. TF-IDF cosine similarity, reported test macro-F1 0.359
-2. Paired TF-IDF with SGD logistic loss, reported test macro-F1 0.436
-
-This gives us a simple reference before we test a semantic model in a later milestone.
+The semantic approaches remain useful options for candidate development. They need to be tested on our selected data; results from different papers and tasks are not directly comparable.
 
 ## References
 

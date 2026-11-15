@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This preprocessing pipeline prepares the public resume-job dataset for the two baseline models. It follows the steps reported in the anchor paper and records the details needed to repeat the work.
+This pipeline prepares the public resume–job dataset for model development. It records the cleaning steps and split settings needed to repeat the work.
 
 ## Original Data
 
@@ -55,7 +55,7 @@ The function:
 
 No resume or job description becomes empty after cleaning. All cleaned text passes checks for lowercase text, allowed characters, repeated spaces, and outer spaces.
 
-The paper does not provide its exact regular expressions or placeholder words. This implementation follows the written method, but small cleaning differences may affect the reproduced result.
+C++ and C# are preserved in cleaned text. Model tokenization needs a separate check: preserving a term during cleaning does not guarantee that TF-IDF keeps it as a feature.
 
 ## Stratified Split
 
@@ -76,7 +76,7 @@ The official test split is not divided or used for model selection. Its original
 | Test | 1,759 |
 | Total | 7,987 |
 
-These sizes match the anchor paper.
+The split is repeatable with random seed 42.
 
 ## Final Label Counts
 
@@ -86,7 +86,7 @@ These sizes match the anchor paper.
 | Validation | 308 | 311 | 627 | 1,246 |
 | Test | 458 | 444 | 857 | 1,759 |
 
-The label counts match the anchor paper. The class percentages also remain similar across all splits.
+Class percentages remain similar across all splits.
 
 The split-distribution figure is available at [figures/split-label-distribution.png](figures/split-label-distribution.png).
 
@@ -100,16 +100,22 @@ The split-distribution figure is available at [figures/split-label-distribution.
 
 No complete resume-job pair appears in more than one split.
 
-The pair-level split still shares many resumes and job descriptions between training and validation. Many test resumes also appear in training or validation. This matches the paper's split method, but it limits how strongly the results show performance on completely new resumes.
+The pair-level split still shares many resumes and job descriptions between training and validation. Many test resumes also appear in training or validation. The official test set supports evaluation on new jobs against a largely known candidate pool. It does not establish performance on completely new candidates. Validation shares job descriptions with training, so job-grouped validation would better represent unseen jobs during model selection.
 
 ## Validation Checks
 
 The notebook confirms that:
 
 - The clean training data has 6,228 rows.
-- Final split sizes match the paper.
-- Label counts match the paper.
+- Split sizes are 4,982 training, 1,246 validation, and 1,759 test rows.
+- Class counts match the reported split table.
 - Every split has no duplicate pairs.
 - Complete pairs do not overlap across splits.
 - Official test rows and labels are unchanged.
 - Running the split again with seed 42 gives the same rows.
+
+## Cleaned-pair checks
+
+Duplicate and overlap checks cover both original and cleaned text. There are no duplicate pairs within a split and no shared pairs across splits. The notebook stops if these checks fail. Shared resumes and job descriptions still limit the evaluation, so exact-pair separation does not establish independence between candidates or jobs.
+
+Prepared records remain in notebook memory and are recreated by running the notebook. Raw and cleaned datasets are not stored in the repository.
