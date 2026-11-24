@@ -15,6 +15,9 @@ The transformer experiments use a shared data-preparation workflow before tokeni
 | [Input lengths](tokenization/input_lengths.csv) | Untruncated training and validation token statistics |
 | [Tokenization report](tokenization/tokenization_report.csv) | Tokenized row counts, lengths, and training/validation retention |
 | [Batch report](tokenization/batch_report.csv) | Dynamic-padding checks and label tensor types |
+| [MiniLM fine-tuning notebook](notebooks/m3-minilm-finetuning.ipynb) | Uploaded training notebook and saved outputs unchanged |
+| [Experiment log](experiment-log.csv) | Comparable run summaries using the shared M3 split protocol |
+| [MiniLM experiment evidence](experiments/minilm-v1/) | Training history, selected-checkpoint validation reports, run settings, and reload checks |
 
 The three split files are the extracted contents of the Colab setup archive. The ZIP is not duplicated in the repository. No resume or job-description records are included in these artifacts.
 
@@ -58,7 +61,7 @@ Keep the same dataset revision, preparation functions, source row identifiers, a
 
 Rebuild the prepared pool, select rows by their saved identifiers in the recorded order, and verify the split counts and overlap. Use validation to select settings and leave official test labels out of training and model selection. The recorded notebook verifies that saved identifiers reconstruct every split exactly.
 
-The transformer-input notebook reconstructs these exact source rows and prepares both models' inputs. Model fine-tuning builds on the resulting datasets and collators; no transformer weights have been trained in this workflow yet.
+The transformer-input notebook reconstructs these exact source rows and prepares both models' inputs. The MiniLM fine-tuning experiment described below uses these datasets and collators. The input-preparation notebook remains a separate, unchanged reference.
 
 ## Transformer input preparation
 
@@ -103,3 +106,53 @@ Tokenized datasets retain 5,081 training rows, 1,147 validation rows, and 1,759 
 6. Save the notebook and archive. Keep the runtime connected when continuing into fine-tuning, since `tokenized_datasets` and `collators` are in memory.
 
 Tokenization and collation settings are stored in the configuration; complete package versions are also recorded there. Tokenized sequences and resume/job text are not exported in these repository artifacts. The original M1/M2 notebooks and the data-setup notebook remain unchanged.
+
+## MiniLM fine-tuning
+
+The [training notebook](notebooks/m3-minilm-finetuning.ipynb) fine-tunes all 33,361,155 parameters of `microsoft/MiniLM-L12-H384-uncased`, including a newly initialised three-class head. It builds on the shared split and input policy without changing either earlier notebook. Its code and saved outputs are copied unchanged from the uploaded Colab notebook.
+
+### Training setup
+
+| Setting | Recorded value |
+|---|---|
+| Model revision | `44acabbec0ef496f6dbc93adadea57f376b7c0ec` |
+| Data | Shared M3 splits: 5,081 training, 1,147 validation, 1,759 test rows |
+| Input policy | 512 tokens, `longest_first`, dynamic padding |
+| Training batch size | 8 |
+| Gradient accumulation | 2; effective batch size 16 |
+| Optimizer | AdamW; learning rate 0.00002; weight decay 0.01 |
+| Loss | Unweighted cross-entropy |
+| Precision | FP16 mixed precision |
+| Warmup | 96 optimizer updates, followed by linear learning-rate decay |
+| Epoch limit | 3 |
+| Checkpoint selection | Highest validation macro-F1 after each epoch |
+| Early stopping | Patience of one evaluation without improvement |
+| Seed | 42 |
+
+The run reached three epochs and 954 optimizer updates. Training wall time was 279.61 seconds, about 4.66 minutes, with a peak PyTorch GPU allocation of 1.42 GB. This allocation is not a measurement of total device memory use by every process.
+
+### Validation results
+
+| Epoch | Validation loss | Accuracy | Macro-F1 | Good Fit recall | Potential Fit recall | No Fit recall |
+|---|---:|---:|---:|---:|---:|---:|
+| 1 | 1.0458 | 0.4673 | 0.2123 | 0.0000 | 0.0000 | 1.0000 |
+| 2 | 1.0560 | 0.4682 | 0.3081 | 0.2643 | 0.0000 | 0.8638 |
+| 3 | 1.0312 | 0.4664 | 0.3042 | 0.2500 | 0.0000 | 0.8675 |
+
+The selected checkpoint is epoch 2, `checkpoint-636`, because selection uses macro-F1 rather than validation loss. Its exact validation macro-F1 is 0.3081366354246464. The [metrics](experiments/minilm-v1/validation_metrics.json), [class report](experiments/minilm-v1/validation_class_report.csv), and [confusion matrix](experiments/minilm-v1/validation_confusion_matrix.csv) describe that selected checkpoint; the [history](experiments/minilm-v1/training_history.csv) contains all recorded evaluations and training logs.
+
+The selected model predicts Good Fit for 271 validation pairs and No Fit for 876, with no Potential Fit predictions. It correctly identifies 74 of 280 Good Fit examples and 463 of 536 No Fit examples. This class-level failure must remain visible when selecting a final model. The experiment does not establish an improvement, and its grouped-validation score cannot be compared directly with historical M2 test scores from a different split protocol. The effect of class imbalance, input truncation, and other possible causes needs a controlled comparison rather than an assumed explanation.
+
+No official-test predictions or metrics were produced for this MiniLM run. Tokenizing test inputs in the shared input workflow is separate from evaluating a trained model on test labels.
+
+### Reproduction and saved model
+
+1. Open the fine-tuning notebook in a fresh Colab T4 runtime and run its environment and data-reconstruction cells. Upload the data-setup ZIP when prompted and verify the shared split checks.
+2. Reuse the model and tokenizer revisions recorded in the shared [tokenization configuration](tokenization/tokenization_config.json). The copy in the uploaded reports is identical, so the repository keeps one canonical copy.
+3. Follow the forward-pass check, throughput benchmark, training configuration, and training cells in order. The benchmark does not perform optimizer steps. Run the training cell once per experiment; rerunning it without reinitialising the model is not an independent repeat.
+4. Validate the selected checkpoint, then export the model and reports. The notebook writes them beneath `/content/m3_training/minilm/` and downloads `minilm_v1_model.zip` and `minilm_v1_reports.zip`.
+5. Keep model weights in local or approved artifact storage. They are not included in this repository. To use the trained model later, extract the model ZIP into a folder and load that folder with `AutoModelForSequenceClassification.from_pretrained` and `AutoTokenizer.from_pretrained`.
+
+The [training arguments](experiments/minilm-v1/training_arguments.json) and [run summary](experiments/minilm-v1/run_summary.json) record the actual run. [Reload verification](experiments/minilm-v1/reload_check.json) confirms that all 201 saved state tensors match the Trainer model exactly, the tokenizer and labels match, and logits match on two validation examples under aligned FP16 autocast. The maximum recorded logit difference is zero. This checks export integrity, not model quality.
+
+The [experiment log](experiment-log.csv) records this initial transformer result. DistilBERT and any targeted improvement should use the same shared data protocol and report their measured class-level trade-offs before a model is selected for deployment.
