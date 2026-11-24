@@ -24,6 +24,7 @@ The [related-work overview](m1/related-work.md) connects the paper reviews to th
 - [Baseline models](m2/notebooks/m2-baseline-reproduction.ipynb): TF-IDF cosine similarity and paired TF-IDF with SGD, with the original saved results.
 - [Transformer data setup](m3/README.md): the Colab notebook, shared job-grouped splits, and reproduction instructions for model development.
 - [Transformer inputs](m3/notebooks/m3-transformer-models.ipynb): the executed MiniLM and DistilBERT tokenization workflow, truncation reports, and batch checks.
+- [MiniLM fine-tuning](m3/notebooks/m3-minilm-finetuning.ipynb): the executed training workflow and validation evidence, summarised in the [experiment log](m3/experiment-log.csv).
 
 The preparation notebook provides the data workflow and additional cleaned-pair checks. The baseline notebook retains the existing model implementation so candidate approaches can build on it. Its saved test macro-F1 values are 0.3708 for cosine similarity and 0.4100 for paired TF-IDF with SGD.
 

@@ -1,0 +1,8 @@
+{
+  "weights_match_exactly": true,
+  "tokenizer_and_labels_match": true,
+  "comparison_precision": "FP16 autocast",
+  "validation_examples_checked": 2,
+  "maximum_logit_difference": 0.0,
+  "passed": true
+}
