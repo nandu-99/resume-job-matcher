@@ -1,0 +1,21 @@
+{
+  "run_id": "tfidf_sgd_v1",
+  "validation_metrics": {
+    "accuracy": 0.44289450741063646,
+    "macro_f1": 0.2922531126257191,
+    "weighted_f1": 0.35995828930995616,
+    "recall_good_fit": 0.014285714285714285,
+    "recall_potential_fit": 0.19637462235649547,
+    "recall_no_fit": 0.8190298507462687
+  },
+  "validation_prediction_counts": {
+    "Good Fit": 35,
+    "Potential Fit": 196,
+    "No Fit": 916
+  },
+  "vocabulary_size": 50000,
+  "classifier_iterations": 48,
+  "vectorization_seconds": 16.625555439000095,
+  "classifier_training_seconds": 6.6647429399999965,
+  "official_test_evaluated": false
+}

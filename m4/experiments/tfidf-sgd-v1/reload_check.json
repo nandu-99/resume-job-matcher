@@ -1,0 +1,8 @@
+{
+  "vocabulary_matches": true,
+  "classifier_weights_match_exactly": true,
+  "validation_predictions_match_exactly": true,
+  "validation_examples_checked": 1147,
+  "model_input": "Cleaned pair text using the recorded baseline preparation",
+  "passed": true
+}

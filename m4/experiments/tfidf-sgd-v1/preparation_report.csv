@@ -1,0 +1,4 @@
+Split,Rows,Unique jobs,Empty resumes,Empty jobs,Duplicate pairs
+Training,5081,229,0,0,0
+Validation,1147,51,0,0,0
+Official test,1759,71,0,0,0
