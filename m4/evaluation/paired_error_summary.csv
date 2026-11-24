@@ -1,0 +1,4 @@
+true_label,original_correct,weighted_correct,weighted_fixed,weighted_regression,both_wrong
+Good Fit,59,47,12,24,209
+Potential Fit,36,55,31,12,264
+No Fit,450,434,16,32,70

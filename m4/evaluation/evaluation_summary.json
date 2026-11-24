@@ -1,0 +1,41 @@
+{
+  "recorded_at_utc": "2026-11-24T16:22:55.519551+00:00",
+  "dataset": "cnamuangtoun/resume-job-description-fit",
+  "dataset_revision": "08978e21714984bb417547d2c0f9b477f5298163",
+  "split_manifest_sha256": "66d99385f73baafa29fd64e5652482cc5b01bea50f172b60b6dc155e2fe1bd4c",
+  "seed": 42,
+  "label2id": {
+    "Good Fit": 0,
+    "Potential Fit": 1,
+    "No Fit": 2
+  },
+  "package_versions": {
+    "transformers": "5.24.0",
+    "huggingface-hub": "1.33.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.15.0",
+    "torch": "2.14.1+cu130",
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "datasets": "4.8.5",
+    "scikit-learn": "1.6.1"
+  },
+  "selected_model": "DistilBERT class-weighted",
+  "selected_weights_sha256": "004d162ccc9daa4311ff9edeecb1e860a3638a5d0e0c530f5a929df7a40d4b72",
+  "selection_changed_after_test": false,
+  "official_test_evaluated": true,
+  "official_test_rows": 1759,
+  "selected_test_result": {
+    "Role": "Selected",
+    "Test macro-F1": 0.35633136401864035,
+    "Test accuracy": 0.43035815804434335,
+    "Good Fit recall": 0.19213973799126638,
+    "Potential Fit recall": 0.23423423423423423,
+    "No Fit recall": 0.6592765460910152
+  },
+  "highest_test_macro_f1_model": "TF-IDF + SGD",
+  "reviewed_validation_cases": 30,
+  "robustness_pairs_per_variant": 300,
+  "robustness_variants": 6,
+  "inference_repeats_per_setting": 30
+}
