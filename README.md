@@ -22,6 +22,7 @@ The [related-work overview](m1/related-work.md) connects the paper reviews to th
 - [Project presentation](m2/presentation.pdf): 10 slides covering the problem, data, methods, and findings.
 - [Data preparation guide](m2/README.md): dataset reports, preparation steps, and notebook instructions.
 - [Baseline models](m2/notebooks/m2-baseline-reproduction.ipynb): TF-IDF cosine similarity and paired TF-IDF with SGD, with the original saved results.
+- [Transformer data setup](m3/README.md): the Colab notebook, shared job-grouped splits, and reproduction instructions for model development.
 
 The preparation notebook provides the data workflow and additional cleaned-pair checks. The baseline notebook retains the existing model implementation so candidate approaches can build on it. Its saved test macro-F1 values are 0.3708 for cosine similarity and 0.4100 for paired TF-IDF with SGD.
 
