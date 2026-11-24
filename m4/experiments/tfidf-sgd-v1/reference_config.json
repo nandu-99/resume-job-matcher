@@ -1,0 +1,76 @@
+{
+  "run_id": "tfidf_sgd_v1",
+  "dataset": "cnamuangtoun/resume-job-description-fit",
+  "dataset_revision": "08978e21714984bb417547d2c0f9b477f5298163",
+  "seed": 42,
+  "split_manifest_sha256": "66d99385f73baafa29fd64e5652482cc5b01bea50f172b60b6dc155e2fe1bd4c",
+  "split_rows": {
+    "Training": 5081,
+    "Validation": 1147,
+    "Official test": 1759
+  },
+  "labels": [
+    "Good Fit",
+    "Potential Fit",
+    "No Fit"
+  ],
+  "preprocessing": "Original M2 baseline cleaning applied to raw text",
+  "pair_format": "resume {cleaned_resume} job {cleaned_job}",
+  "input_truncation": null,
+  "vectorizer": {
+    "analyzer": "word",
+    "binary": false,
+    "decode_error": "strict",
+    "dtype": "float64",
+    "encoding": "utf-8",
+    "input": "content",
+    "lowercase": true,
+    "max_df": 0.98,
+    "max_features": 50000,
+    "min_df": 3,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "norm": "l2",
+    "preprocessor": null,
+    "smooth_idf": true,
+    "stop_words": "english",
+    "strip_accents": null,
+    "sublinear_tf": true,
+    "token_pattern": "(?u)\\b\\w\\w+\\b",
+    "tokenizer": null,
+    "use_idf": true,
+    "vocabulary": null
+  },
+  "classifier": {
+    "alpha": 1e-05,
+    "average": false,
+    "class_weight": null,
+    "early_stopping": false,
+    "epsilon": 0.1,
+    "eta0": 0.0,
+    "fit_intercept": true,
+    "l1_ratio": 0.15,
+    "learning_rate": "optimal",
+    "loss": "log_loss",
+    "max_iter": 1000,
+    "n_iter_no_change": 5,
+    "n_jobs": null,
+    "penalty": "l2",
+    "power_t": 0.5,
+    "random_state": 42,
+    "shuffle": true,
+    "tol": 0.001,
+    "validation_fraction": 0.1,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "python_version": "3.13.16",
+  "package_versions": {
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.6.1",
+    "datasets": "4.8.5"
+  }
+}
