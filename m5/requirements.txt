@@ -1,4 +1,5 @@
-# CPU inference environment verified for the saved M4 checkpoint.
+# Runtime dependencies for CPU inference and the Streamlit interface.
 torch==2.10.0
 transformers==5.3.0
 tokenizers==0.22.2
+streamlit==1.67.0

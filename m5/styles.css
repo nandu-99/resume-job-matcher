@@ -1,0 +1,144 @@
+:root {
+    color-scheme: light;
+}
+
+html,
+body,
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"] {
+    background: #ffffff !important;
+    color: #242424 !important;
+}
+
+header[data-testid="stHeader"],
+#MainMenu,
+[data-testid="stToolbar"],
+[data-testid="stDecoration"] {
+    display: none !important;
+}
+
+[data-testid="stMainBlockContainer"] {
+    max-width: 1120px;
+    padding: 3.5rem 2.5rem 2.5rem;
+}
+
+h1 {
+    color: #242424 !important;
+    font-size: 2.65rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.045em;
+    padding-bottom: 0.45rem !important;
+}
+
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p {
+    color: #626262 !important;
+    line-height: 1.5;
+}
+
+.st-key-input_actions {
+    margin: 0.55rem 0 0.4rem;
+}
+
+[data-testid="stTextArea"] label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+[data-testid="stTextArea"] textarea {
+    background: #ffffff !important;
+    color: #242424 !important;
+    border-radius: 9px;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    padding: 0.9rem 1rem;
+    caret-color: #242424;
+}
+
+[data-testid="stTextArea"] textarea::placeholder {
+    color: #737373 !important;
+    opacity: 1;
+}
+
+[data-testid="stTextArea"] [data-baseweb="textarea"] {
+    background: #ffffff !important;
+    border-color: #d9d9d9;
+    border-radius: 9px;
+}
+
+button[kind="primary"],
+button[kind="secondary"] {
+    background: #ffffff !important;
+    color: #242424 !important;
+    border: 1px solid #d9d9d9 !important;
+    border-radius: 7px;
+    min-height: 2.5rem;
+    box-shadow: none !important;
+}
+
+button[kind="primary"] {
+    border-color: #242424 !important;
+    font-weight: 600;
+    min-width: 160px;
+}
+
+button[kind="primary"]:hover,
+button[kind="secondary"]:hover {
+    background: #f7f7f7 !important;
+    border-color: #242424 !important;
+}
+
+button[kind="primary"]:disabled {
+    background: #ffffff !important;
+    color: #8a8a8a !important;
+    border-color: #d9d9d9 !important;
+}
+
+button:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #454545 !important;
+    outline-offset: 3px;
+}
+
+.st-key-result_panel {
+    margin-top: 0.8rem;
+    background: #ffffff !important;
+    border-radius: 10px;
+}
+
+.st-key-result_panel h3 {
+    color: #242424 !important;
+    font-size: 1.55rem !important;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+[data-testid="stExpander"],
+[data-testid="stExpander"] details,
+[data-testid="stExpander"] summary,
+[data-testid="stAlert"],
+[data-testid="stAlertContainer"] {
+    background: #ffffff !important;
+    color: #242424 !important;
+}
+
+@media (max-width: 640px) {
+    [data-testid="stMainBlockContainer"] {
+        padding: 2rem 1.1rem;
+    }
+
+    h1 {
+        font-size: 2rem !important;
+    }
+
+    .st-key-input_columns [data-testid="stHorizontalBlock"] {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .st-key-input_columns [data-testid="stColumn"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+}
