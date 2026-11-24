@@ -1,0 +1,24 @@
+{
+  "run_id": "distilbert_v1",
+  "model": "distilbert/distilbert-base-uncased",
+  "model_revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+  "dataset_revision": "08978e21714984bb417547d2c0f9b477f5298163",
+  "seed": 42,
+  "loss": "unweighted cross-entropy",
+  "split_rows": {
+    "Training": 5081,
+    "Validation": 1147,
+    "Official test": 1759
+  },
+  "best_checkpoint": "checkpoint-636",
+  "best_validation_macro_f1": 0.3540327601192508,
+  "optimizer_updates": 954,
+  "training_wall_seconds": 280.16195572200013,
+  "peak_gpu_allocated_gb": 1.9487133026123047,
+  "validation_prediction_counts": {
+    "Good Fit": 204,
+    "Potential Fit": 68,
+    "No Fit": 875
+  },
+  "official_test_evaluated": false
+}

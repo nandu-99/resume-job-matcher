@@ -18,6 +18,12 @@ The transformer experiments use a shared data-preparation workflow before tokeni
 | [MiniLM fine-tuning notebook](notebooks/m3-minilm-finetuning.ipynb) | Uploaded training notebook and saved outputs unchanged |
 | [Experiment log](experiment-log.csv) | Comparable run summaries using the shared M3 split protocol |
 | [MiniLM experiment evidence](experiments/minilm-v1/) | Training history, selected-checkpoint validation reports, run settings, and reload checks |
+<<<<<<< HEAD
+| [DistilBERT fine-tuning notebook](notebooks/m3-distilbert-finetuning.ipynb) | Uploaded Colab notebook with training, export checks, and comparison outputs unchanged |
+| [DistilBERT experiment evidence](experiments/distilbert-v1/) | Training history, validation reports, run settings, and reload checks |
+| [Model comparison](comparison/comparison_notes.md) | Findings with the numeric comparison and figure |
+=======
+>>>>>>> origin/main
 
 The three split files are the extracted contents of the Colab setup archive. The ZIP is not duplicated in the repository. No resume or job-description records are included in these artifacts.
 
@@ -155,4 +161,35 @@ No official-test predictions or metrics were produced for this MiniLM run. Token
 
 The [training arguments](experiments/minilm-v1/training_arguments.json) and [run summary](experiments/minilm-v1/run_summary.json) record the actual run. [Reload verification](experiments/minilm-v1/reload_check.json) confirms that all 201 saved state tensors match the Trainer model exactly, the tokenizer and labels match, and logits match on two validation examples under aligned FP16 autocast. The maximum recorded logit difference is zero. This checks export integrity, not model quality.
 
+<<<<<<< HEAD
+The [experiment log](experiment-log.csv) records both transformer runs. Any targeted improvement should use the same shared data protocol and report measured class-level trade-offs before a model is selected for deployment.
+
+## DistilBERT fine-tuning and comparison
+
+The [DistilBERT notebook](notebooks/m3-distilbert-finetuning.ipynb) contains the shared preparation workflow, the MiniLM reference run, DistilBERT training, export verification, and the model comparison. It is copied unchanged from the uploaded Colab notebook. The earlier notebooks remain separate references.
+
+DistilBERT uses revision `12040accade4e8a0f71eabdb258fecc2e7e948be` and fine-tunes all 66,955,779 parameters. Its [training arguments](experiments/distilbert-v1/training_arguments.json) match MiniLM's except for the output directory, including three maximum epochs, seed 42, unweighted cross-entropy, effective batch size 16, learning rate 0.00002, FP16, and validation macro-F1 selection. Both use early-stopping patience one. MiniLM and its optimizer tensors were moved to CPU before measuring DistilBERT GPU use.
+
+The run reached three epochs and 954 optimizer updates. Epoch 2, `checkpoint-636`, has the highest validation macro-F1. The [history](experiments/distilbert-v1/training_history.csv), [metrics](experiments/distilbert-v1/validation_metrics.json), and [confusion matrix](experiments/distilbert-v1/validation_confusion_matrix.csv) preserve the measured results.
+
+| Model | Validation macro-F1 | Accuracy | Good Fit recall | Potential Fit recall | No Fit recall | Training minutes | Peak GPU GB |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| MiniLM | 0.3081 | 0.4682 | 0.2643 | 0.0000 | 0.8638 | 4.66 | 1.42 |
+| DistilBERT | 0.3540 | 0.4752 | 0.2107 | 0.1088 | 0.8396 | 4.67 | 1.95 |
+
+DistilBERT improves validation macro-F1 by 0.0459 absolute and predicts all three classes. It correctly identifies 59 of 280 Good Fit examples, 36 of 331 Potential Fit examples, and 450 of 536 No Fit examples. MiniLM retains higher Good Fit recall. DistilBERT is the stronger candidate for further experiments under macro-F1, while the low suitable-candidate recalls still need attention.
+
+The [comparison notes](comparison/comparison_notes.md), [CSV](comparison/model_comparison.csv), and [figure](comparison/model_comparison.png) show the trade-offs. These are single-seed validation results. Recorded training times and peak PyTorch allocations are single-run measurements, not inference benchmarks. Neither transformer has official-test metrics. Historical M2 test scores use another split protocol and cannot establish which method is better on this task without a shared-protocol comparison.
+
+### Reproduction and export
+
+Run the uploaded notebook in order in a fresh Colab T4 runtime, uploading `m3_data_setup.zip` when prompted. The notebook includes the MiniLM run needed by its comparison cells. Check the saved dataset and checkpoint revisions against the canonical configurations when reproducing the run.
+
+DistilBERT files are written beneath `/content/m3_training/distilbert/`; comparison files are written beneath `/content/m3_comparison/`. The notebook downloads `distilbert_v1_model.zip` and `distilbert_v1_reports.zip`, with comparison files inside the reports archive. Keep the model archive in artifact storage and load its extracted folder through `AutoModelForSequenceClassification.from_pretrained` and `AutoTokenizer.from_pretrained` when needed. Model weights and archives are excluded from this repository handoff.
+
+The [reload check](experiments/distilbert-v1/reload_check.json) confirms exact equality of all 104 saved state tensors, matching tokenizer and label mappings, and zero logit difference on two validation examples using aligned FP16 autocast. This verifies export integrity. The duplicate tokenization configuration from the reports archive matches the canonical [configuration](tokenization/tokenization_config.json), so it is not copied again.
+
+Further evaluation should examine class-weighted loss and section-aware inputs as separate changes, compare a TF-IDF reference under the same M3 splits, and keep official test evaluation until model selection is fixed.
+=======
 The [experiment log](experiment-log.csv) records this initial transformer result. DistilBERT and any targeted improvement should use the same shared data protocol and report their measured class-level trade-offs before a model is selected for deployment.
+>>>>>>> origin/main
