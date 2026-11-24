@@ -1,0 +1,4 @@
+Split,Good Fit,Potential Fit,No Fit,Total,Unique jobs
+Training,1258,1223,2600,5081,229
+Validation,280,331,536,1147,51
+Official test,458,444,857,1759,71
