@@ -1,0 +1,3 @@
+Model,Input shape,Padding tokens,Label dtype
+MiniLM,"(8, 512)",475,torch.int64
+DistilBERT,"(8, 512)",475,torch.int64

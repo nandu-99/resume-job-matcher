@@ -1,0 +1,5 @@
+Model,Split,Mean resume tokens,Mean job tokens,Median pair tokens,Pairs over 512 (%)
+MiniLM,Training,1153.7,530.9,1576.0,99.63
+MiniLM,Validation,1169.9,404.0,1443.0,99.39
+DistilBERT,Training,1153.7,530.9,1576.0,99.63
+DistilBERT,Validation,1169.9,404.0,1443.0,99.39
