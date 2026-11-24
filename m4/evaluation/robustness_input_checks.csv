@@ -1,0 +1,7 @@
+Variant,Pairs,Prepared text changed,Tokenized inputs changed,Empty resumes,Minimum tokens,Maximum tokens
+original,300,0,0,0,437,512
+extra_whitespace,300,300,0,0,437,512
+case_change,300,300,0,0,437,512
+block_order,300,300,300,0,437,512
+skills_removed,300,234,133,0,384,512
+long_prefix,300,300,300,0,512,512

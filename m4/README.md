@@ -18,8 +18,13 @@ Evaluation uses the shared M3 job-grouped splits for the TF-IDF reference, secti
 | [Class-weighted notebook](notebooks/m4-class-weighted-distilbert.ipynb) | Uploaded continuation with original-input reconstruction, weighted training, and export checks unchanged |
 | [Class-weighted experiment reports](experiments/distilbert-weighted-v1/) | Class weights, run settings, input audit, history, validation evidence, and reload check |
 | [Loss comparison](comparison/class-weighted-v1/comparison_notes.md) | Original versus weighted loss results, trade-offs, CSV, and figure |
+| [Final evaluation notebook](notebooks/m4-final-evaluation.ipynb) | Uploaded executed continuation unchanged |
+| [Evaluation report](evaluation/evaluation_report.md) | Shared-protocol results, error review, robustness, inference, and limitations |
+| [Frozen selection](evaluation/model_selection.json) | Pre-test decision, input policy, checkpoint hash, and fixed comparators |
+| [Official-test results](evaluation/official_test_metrics.csv) | Selected model and comparator scores on the unchanged official test |
+| [Artifact manifest](evaluation/artifact_manifest.json) | Original archive checksums for final evaluation evidence |
 
-The reference notebook and all 12 files from its uploaded reports archive are preserved unchanged. The section-aware notebook and all 17 files from its reports archive are also preserved unchanged. The class-weighted notebook and all 14 files from its reports archive are preserved unchanged. The report folders contain source row identifiers and labels rather than resume or job text. Trained model files and downloaded ZIPs stay outside Git.
+The reference notebook and all 12 files from its uploaded reports archive are preserved unchanged. The section-aware notebook and all 17 files from its reports archive are also preserved unchanged. The class-weighted notebook and all 14 files from its reports archive are preserved unchanged. The final evaluation notebook and all 27 files from its reports archive are also preserved unchanged. The report folders contain source row identifiers, labels, predictions, and paraphrased evidence notes rather than full resume or job records. Trained model files and downloaded ZIPs stay outside Git.
 
 ## Shared evaluation protocol
 
@@ -47,7 +52,7 @@ The reference correctly classifies 508 of 1,147 validation pairs. It identifies 
 
 DistilBERT leads on macro-F1 by 0.0618 absolute over the reference. MiniLM has the highest Good Fit recall, while TF-IDF has the highest Potential Fit recall among these runs. All three miss many suitable candidates.
 
-The notebook imports transformer reports and checks their dataset revision, seed, split counts, and labels. The comparison uses common validation rows, while preprocessing and available document content differ across approaches. It compares complete approaches and does not isolate the effect of architecture. These are single-seed validation results. The official test set is not evaluated in this contribution.
+The notebook imports transformer reports and checks their dataset revision, seed, split counts, and labels. The comparison uses common validation rows, while preprocessing and available document content differ across approaches. It compares complete approaches and does not isolate the effect of architecture. These are single-seed validation results. The reference-development notebook does not evaluate the official test set; the later final evaluation assesses this saved reference and the two frozen transformer candidates.
 
 ## Reproduction and saved model
 
@@ -61,9 +66,9 @@ The model archive contains a fitted TF-IDF/classifier pipeline and its configura
 
 The [reload report](experiments/tfidf-sgd-v1/reload_check.json) records equal vocabulary and classifier weights and identical predictions across all 1,147 validation examples. This checks export integrity rather than model quality.
 
-## Further evaluation
+## Evaluation workflow
 
-Use the fixed reference and recorded original DistilBERT results when assessing further changes. Keep class-weighted training separate from the section-aware input experiment. Categorise validation errors, test robustness, and measure inference performance. Freeze model and preparation settings before official-test evaluation. The recorded section-aware policy is not selected because it lowers macro-F1.
+The input-policy and class-weighted experiments below use validation data for comparison. The final evaluation then reviews errors, tests robustness, measures inference, records the frozen selection, and evaluates the unchanged official test. The section-aware policy is not selected because it lowers validation macro-F1.
 
 ## Section-aware input experiment
 
@@ -94,7 +99,7 @@ Macro-F1 falls by 0.0282 absolute. The section-aware model correctly identifies 
 
 See the [metrics](experiments/distilbert-section-v1/validation_metrics.json), [confusion matrix](experiments/distilbert-section-v1/validation_confusion_matrix.csv), and [comparison notes](comparison/section-aware-v1/comparison_notes.md). The [comparison CSV](comparison/section-aware-v1/input_policy_comparison.csv) and [figure](comparison/section-aware-v1/input_policy_comparison.png) preserve the numeric and visual evidence. This is an unsuccessful improvement iteration rather than evidence that section-aware methods cannot help.
 
-The policy changes section selection, ordering, inserted labels, and document budget allocation together. The experiment does not isolate their individual effects. Heading rules can misinterpret unusual formats, and no specific cause of the score decrease has been established. These are single-seed validation results. Neither the original nor section-aware transformer is evaluated on official test labels here; the section policy does not process official test documents.
+The policy changes section selection, ordering, inserted labels, and document budget allocation together. The experiment does not isolate their individual effects. Heading rules can misinterpret unusual formats, and no specific cause of the score decrease has been established. These are single-seed validation results. This input-policy notebook does not evaluate official test labels, and the section-aware policy remains untested on the official test. The later final evaluation assesses the two original-input checkpoints.
 
 ### Reproduction and model storage
 
@@ -139,7 +144,7 @@ The weighted run improves validation macro-F1 by 0.0042 absolute. It correctly i
 
 The [class report](experiments/distilbert-weighted-v1/validation_class_report.csv), [confusion matrix](experiments/distilbert-weighted-v1/validation_confusion_matrix.csv), and [comparison notes](comparison/class-weighted-v1/comparison_notes.md) show the trade-off. Potential Fit recall improves while Good Fit recall, No Fit recall, and accuracy decrease. The [CSV](comparison/class-weighted-v1/loss_comparison.csv) and [figure](comparison/class-weighted-v1/loss_comparison.png) preserve the comparison.
 
-This is the highest recorded validation macro-F1 among these DistilBERT variants, but the gain is small and comes from one seed. It does not establish a reliable improvement or a final deployment choice. Keep both original-input candidates available for error analysis, robustness checks, and inference measurements. Freeze the selection before official-test evaluation; the official test remains unevaluated in this contribution.
+This is the highest recorded validation macro-F1 among these DistilBERT variants, but the gain is small and comes from one seed. It does not establish a reliable improvement or a final deployment choice. This training notebook records validation-only results. The later final evaluation compares both original-input checkpoints on errors, robustness, inference, and the official test after freezing selection.
 
 ### Reproduction and export
 
@@ -148,3 +153,53 @@ Use a fresh Colab T4 runtime with the recorded package versions and the shared d
 The notebook writes artifacts under `/content/m4_training/distilbert_weighted_v1/` and downloads `distilbert_weighted_v1_reports.zip` and `distilbert_weighted_v1_model.zip`. Keep model weights separately from Git. The model archive contains the classifier, tokenizer, and weighted-run configuration. Inference uses the original M3 `prepare_text` function and paired tokenization. Class weights and the custom trainer are needed for training reproduction rather than ordinary prediction.
 
 The [reload check](experiments/distilbert-weighted-v1/reload_check.json) records exact equality of 104 state tensors, matching tokenizer/labels and configuration, and zero logit difference on two validation examples under aligned FP16 autocast. This checks export integrity. Handoff validation checks saved reports and calculations without repeating GPU training or inference.
+
+## Final evaluation and model selection
+
+The [final notebook](notebooks/m4-final-evaluation.ipynb) continues the earlier reference, section-aware, and weighted work before adding assessment. Its code and saved outputs are copied unchanged from the uploaded notebook. The [evaluation directory](evaluation/) contains the exact 27 files from the Colab reports archive, including the original checksum manifest. No original paper summary, presentation, or earlier notebook is modified.
+
+### Selection and official-test results
+
+[Selection](evaluation/model_selection.json) is frozen before test inference using the highest validation macro-F1 among five recorded candidates. It selects class-weighted DistilBERT and identifies original DistilBERT and TF-IDF as fixed test comparators. The record includes the selected checkpoint's SHA-256 hash and original `longest_first` input policy. Test results are used for reporting rather than model reselection or threshold tuning.
+
+| Model | Role | Validation macro-F1 | Test macro-F1 | Test accuracy |
+|---|---|---:|---:|---:|
+| Class-weighted DistilBERT | Selected | 0.3582 | 0.3563 | 0.4304 |
+| Original DistilBERT | Fixed comparator | 0.3540 | 0.3626 | 0.4929 |
+| TF-IDF + SGD | Fixed comparator | 0.2923 | 0.4058 | 0.5009 |
+
+TF-IDF has the highest official-test macro-F1 among the fixed comparisons. The small weighted validation gain does not carry over to the test set. This does not establish transformer superiority or justify changing the recorded selection from test scores. The selected model correctly identifies 88 of 458 Good Fit, 104 of 444 Potential Fit, and 565 of 857 No Fit examples. It classifies 475 Good Fit or Potential Fit pairs as No Fit.
+
+The [report](evaluation/evaluation_report.md), [test scores](evaluation/official_test_metrics.csv), [predictions](evaluation/official_test_predictions.csv), and [per-model class reports and confusion matrices](evaluation/test_reports/) preserve the evidence. The [figure](evaluation/figures/final_evaluation.png) compares validation/test scores and shows the selected model's test confusion matrix.
+
+The [experiment log](experiment-log.csv) now records final-test scores and roles for the reference, original DistilBERT, and weighted DistilBERT. The section-aware row remains untested. Earlier training-run summaries retain their original `official_test_evaluated: false` values because test evaluation occurred later in this separate assessment.
+
+### Reviewed errors and robustness
+
+Weighting fixes 59 original validation errors and introduces 68 regressions. The [30-case annotations](evaluation/error_review_annotations.csv) and [review findings](evaluation/error_review_findings.md) cover specialist requirements not established in the text, label/evidence tensions, input context loss, and text-quality issues. This is an assistant-assisted qualitative review, not an independent recruiter adjudication or causal analysis. Source labels remain unchanged. The sample deliberately balances true labels and case types, and spans 19 unique job texts; its category counts are not population estimates.
+
+Robustness tests use 300 validation pairs with 100 per class. Whitespace and ASCII-case changes yield identical tokenized inputs and reuse predictions. They check preparation behaviour rather than deep semantic robustness. Reversing newline-separated blocks and adding a long review prefix change all 300 inputs. Recognised-skills removal changes prepared text in 234 pairs but tokenized inputs in only 133.
+
+| Stress variant | Original prediction changes | Weighted prediction changes | Pairs with changed input |
+|---|---:|---:|---:|
+| Block order | 47 | 68 | 300 |
+| Skills removed | 13 | 14 | 133 |
+| Long prefix | 80 | 93 | 300 |
+
+The weighted model is more sensitive in these tests. Prediction changes are not automatically errors: removing content can change the evidence needed to judge suitability. The [manifest](evaluation/robustness_manifest.json), [input checks](evaluation/robustness_input_checks.csv), [results](evaluation/robustness_results.csv), and [per-pair predictions](evaluation/robustness_predictions.csv) record transformations and denominators. Long-prefix stress uses 80 copies of the documented review boilerplate on the resume only.
+
+### Inference and further use
+
+[Inference measurements](evaluation/inference_results.csv) use saved models without training wrappers, one model at a time on a T4. Each setting has three warmup batches and 30 timed repeats, with FP16 autocast and fixed inputs already on GPU. Median batch-one times are 8.80 ms for weighted and 10.19 ms for original DistilBERT. Batch-16 times are 47.27 and 47.89 ms. Peak PyTorch allocations are about 0.282 and 0.431 in 1024^3-byte units at the two batch sizes.
+
+These are model-forward measurements excluding preparation, tokenization, transfers, and application handling. The same architecture and one repeated-batch run do not establish a speed advantage. The [protocol](evaluation/inference_protocol.json) and [raw timings](evaluation/inference_timings.csv) state the scope. CPU and application-level measurements remain for prototype integration.
+
+The selected model remains an assessment choice rather than a validated deployment recommendation. Suitable-candidate recall is low, and the study has one seed, shared resumes, heavy truncation, and labels needing review. A prototype should retain human review. Further tuning requires independent evaluation rather than treating the consumed test set as a new validation set.
+
+### Reproduction and artifact integrity
+
+Use a Colab T4 runtime with the recorded versions. The full continuation includes earlier reference and training cells, their data/setup and M3 report uploads, and the final original-model upload. Prepare dependencies before the full run if needed. Use the exact dataset and checkpoint revisions, keep independent repeats separate, and retain the saved assessment artifacts for the recorded results.
+
+The final section requests `distilbert_v1_model.zip` for original-model validation and compares it with the saved original confusion matrix before assessment. The selected weighted model's hash is checked before test inference. Its [selection record](evaluation/model_selection.json) predates the [evaluation summary](evaluation/evaluation_summary.json). The notebook writes `/content/m4_final_evaluation/` and downloads `m4_final_evaluation_reports.zip`; the final archive excludes model weights and the text-containing private review CSV.
+
+[Verification](evaluation/verification.json) records saved-prediction score checks, confusion-matrix checks, robustness totals, inference calculations, and text-column exclusion. Repository validation independently checks these saved artifacts and the archive checksums. GPU training and inference are not repeated during this repository update.

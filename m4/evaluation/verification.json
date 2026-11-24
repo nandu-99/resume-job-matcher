@@ -1,0 +1,10 @@
+{
+  "test_predictions_and_metrics_match": true,
+  "test_confusion_matrices_match": true,
+  "frozen_selection_unchanged": true,
+  "robustness_records_match": true,
+  "inference_calculations_match": true,
+  "review_annotations_complete": true,
+  "document_text_columns_excluded": true,
+  "passed": true
+}

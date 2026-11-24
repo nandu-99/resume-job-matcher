@@ -1,0 +1,37 @@
+{
+  "device": "Tesla T4",
+  "precision": "FP16 autocast; FP32 model weights",
+  "batch_sizes": [
+    1,
+    16
+  ],
+  "warmup_batches": 3,
+  "timed_batches": 30,
+  "source_split": "Validation",
+  "source_row_ids": [
+    3634,
+    482,
+    510,
+    4973,
+    4761,
+    4565,
+    4077,
+    5158,
+    5234,
+    4956,
+    3628,
+    6087,
+    5401,
+    6064,
+    5028,
+    1701
+  ],
+  "timing_scope": "Model forward pass with inputs already on GPU",
+  "excluded": "Text preparation, tokenization, transfers, and response handling",
+  "limitation": "Repeated fixed batches on one Colab GPU",
+  "memory_unit": "1024^3 bytes",
+  "benchmark_order": [
+    "DistilBERT class-weighted",
+    "DistilBERT"
+  ]
+}
