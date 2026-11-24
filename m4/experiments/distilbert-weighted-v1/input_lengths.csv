@@ -1,0 +1,3 @@
+Split,Rows,Minimum tokens,Maximum tokens,Mean tokens
+Training,5081,334,512,511.84648691202517
+Validation,1147,437,512,511.82824760244114

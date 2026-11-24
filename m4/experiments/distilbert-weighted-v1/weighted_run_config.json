@@ -1,0 +1,51 @@
+{
+  "run_id": "distilbert_weighted_v1",
+  "dataset": "cnamuangtoun/resume-job-description-fit",
+  "dataset_revision": "08978e21714984bb417547d2c0f9b477f5298163",
+  "split_manifest_sha256": "66d99385f73baafa29fd64e5652482cc5b01bea50f172b60b6dc155e2fe1bd4c",
+  "model": "distilbert/distilbert-base-uncased",
+  "model_revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+  "seed": 42,
+  "label2id": {
+    "Good Fit": 0,
+    "Potential Fit": 1,
+    "No Fit": 2
+  },
+  "class_weight_formula": "training_rows / (number_of_classes * class_count)",
+  "training_class_counts": {
+    "Good Fit": 1258,
+    "Potential Fit": 1223,
+    "No Fit": 2600
+  },
+  "class_weights": {
+    "Good Fit": 1.346316933631897,
+    "Potential Fit": 1.3848459720611572,
+    "No Fit": 0.6514102816581726
+  },
+  "loss": "Class-weighted cross-entropy",
+  "loss_reduction": "Weighted mean within each microbatch",
+  "model_accepts_loss_kwargs": false,
+  "input_policy": {
+    "text_preparation": "Shared M3 prepare_text; no section selection",
+    "pair_order": [
+      "resume",
+      "job"
+    ],
+    "max_length": 512,
+    "truncation": "longest_first",
+    "truncation_side": "right",
+    "padding": "Dynamic, rounded to a multiple of 8"
+  },
+  "python_version": "3.13.16",
+  "package_versions": {
+    "transformers": "5.24.0",
+    "huggingface-hub": "1.33.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.15.0",
+    "torch": "2.14.1+cu130",
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "datasets": "4.8.5",
+    "scikit-learn": "1.6.1"
+  }
+}

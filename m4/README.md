@@ -1,6 +1,6 @@
 # Evaluation and Optimization
 
-Evaluation uses the shared M3 job-grouped splits for the TF-IDF reference and a section-aware DistilBERT experiment. The reference evaluation reruns paired TF-IDF with SGD on these splits. This provides a validation comparison with MiniLM and DistilBERT using the same source rows. Earlier M2 results use a different split and remain historical results.
+Evaluation uses the shared M3 job-grouped splits for the TF-IDF reference, section-aware DistilBERT inputs, and class-weighted DistilBERT training. The reference evaluation reruns paired TF-IDF with SGD on these splits. This provides a validation comparison with MiniLM and DistilBERT using the same source rows. Earlier M2 results use a different split and remain historical results.
 
 ## Files
 
@@ -8,15 +8,18 @@ Evaluation uses the shared M3 job-grouped splits for the TF-IDF reference and a 
 |---|---|
 | [Reference evaluation notebook](notebooks/m4-reference-evaluation.ipynb) | Uploaded Colab notebook, including executed cells and outputs, unchanged |
 | [Reference experiment reports](experiments/tfidf-sgd-v1/) | Configuration, metrics, class report, confusion matrix, validation predictions, preparation checks, and reload verification |
-| [Experiment log](experiment-log.csv) | Reference and section-aware run summaries, measured results, and timings |
+| [Experiment log](experiment-log.csv) | Reference, section-aware, and class-weighted run summaries, measured results, and timings |
 | [Comparison notes](comparison/comparison_notes.md) | Findings, approach differences, and limitations |
 | [Comparison CSV](comparison/reference_model_comparison.csv) | Exact validation scores for all three approaches |
 | [Comparison figure](comparison/reference_model_comparison.png) | Macro-F1 and class recall comparison |
 | [Section-aware notebook](notebooks/m4-section-aware-inputs.ipynb) | Uploaded Colab continuation with section preparation, training, and saved checks unchanged |
 | [Section-aware experiment reports](experiments/distilbert-section-v1/) | Input policy, training settings, section audits, selected-checkpoint validation reports, and reload checks |
 | [Input-policy comparison](comparison/section-aware-v1/comparison_notes.md) | Original versus section-aware DistilBERT results, decision, CSV, and figure |
+| [Class-weighted notebook](notebooks/m4-class-weighted-distilbert.ipynb) | Uploaded continuation with original-input reconstruction, weighted training, and export checks unchanged |
+| [Class-weighted experiment reports](experiments/distilbert-weighted-v1/) | Class weights, run settings, input audit, history, validation evidence, and reload check |
+| [Loss comparison](comparison/class-weighted-v1/comparison_notes.md) | Original versus weighted loss results, trade-offs, CSV, and figure |
 
-The reference notebook and all 12 files from its uploaded reports archive are preserved unchanged. The section-aware notebook and all 17 files from its reports archive are also preserved unchanged. The report folders contain source row identifiers and labels rather than resume or job text. Trained model files and downloaded ZIPs stay outside Git.
+The reference notebook and all 12 files from its uploaded reports archive are preserved unchanged. The section-aware notebook and all 17 files from its reports archive are also preserved unchanged. The class-weighted notebook and all 14 files from its reports archive are preserved unchanged. The report folders contain source row identifiers and labels rather than resume or job text. Trained model files and downloaded ZIPs stay outside Git.
 
 ## Shared evaluation protocol
 
@@ -102,3 +105,46 @@ The policy changes section selection, ordering, inserted labels, and document bu
 5. Keep the model archive separately. It contains model weights, tokenizer files, and the input configuration. Loading the checkpoint alone does not apply section preparation: inference also needs the notebook's `prepare_text`, heading parsing, section extraction, selection, and pair-building functions with the recorded policy.
 
 The [reload check](experiments/distilbert-section-v1/reload_check.json) confirms exact equality of all 104 state tensors, matching tokenizer/labels and input configuration, and zero logit difference on two validation examples under aligned FP16 autocast. This verifies export integrity. Repository validation checks the saved artifacts and calculations without repeating GPU training.
+
+## Class-weighted DistilBERT experiment
+
+The [class-weighted notebook](notebooks/m4-class-weighted-distilbert.ipynb) continues the earlier notebook and retains the reference and section-aware work before adding weighted training. It is copied unchanged from the uploaded Colab notebook. Earlier notebooks, reports, and comparisons remain unchanged.
+
+### Inputs, weights, and training
+
+Weighted training starts from the same original pretrained DistilBERT revision as M3, not either fine-tuned model. It rebuilds the original resume-first/job-second input pairs using `longest_first`, a 512-token limit, and dynamic padding to a multiple of eight. Section selection is not applied. Training and validation labels and source row order match the saved M3 splits. The input audit records minimum lengths of 334 and 437, maximum lengths of 512, and an `(8, 512)` mixed-length batch with 475 padding tokens.
+
+Weights use training labels only: `training_rows / (number_of_classes * class_count)`.
+
+| Label | Training examples | Class weight |
+|---|---:|---:|
+| Good Fit | 1,258 | 1.3463 |
+| Potential Fit | 1,223 | 1.3848 |
+| No Fit | 2,600 | 0.6514 |
+
+The [configuration](experiments/distilbert-weighted-v1/weighted_run_config.json) records the exact float32 weights used, training counts, input policy, revisions, canonical manifest hash, and environment versions. The [weight report](experiments/distilbert-weighted-v1/class_weights.csv) contains the calculated values before the float32 conversion.
+
+`ClassWeightedTrainer` computes cross-entropy as a weighted mean within each microbatch. It excludes labels from the model forward call, computes loss from float32 logits, and sets `model_accepts_loss_kwargs=False` so Trainer handles gradient accumulation. A synthetic example verifies the weighted loss against a manual calculation. The custom loss path and its normalisation are part of this experiment; weighted and unweighted loss values are not directly comparable.
+
+Saved training arguments match the original DistilBERT run except the output directory: seed 42, three maximum epochs, effective batch size 16, learning rate 0.00002, FP16, validation macro-F1 selection, and early-stopping patience one. The run reaches 954 optimizer updates and selects epoch 2, `checkpoint-636`. Recorded training wall time is 307.42 seconds, about 5.12 minutes, with peak PyTorch GPU allocation of 1.95 GB. These are single-run training measurements rather than inference benchmarks.
+
+### Validation result and trade-offs
+
+| Training loss | Macro-F1 | Accuracy | Good Fit recall | Potential Fit recall | No Fit recall |
+|---|---:|---:|---:|---:|---:|
+| Unweighted cross-entropy | 0.3540 | 0.4752 | 0.2107 | 0.1088 | 0.8396 |
+| Class-weighted cross-entropy | 0.3582 | 0.4673 | 0.1679 | 0.1662 | 0.8097 |
+
+The weighted run improves validation macro-F1 by 0.0042 absolute. It correctly identifies 47 of 280 Good Fit examples, 55 of 331 Potential Fit examples, and 434 of 536 No Fit examples. Predicted counts are 160 Good Fit, 166 Potential Fit, and 821 No Fit.
+
+The [class report](experiments/distilbert-weighted-v1/validation_class_report.csv), [confusion matrix](experiments/distilbert-weighted-v1/validation_confusion_matrix.csv), and [comparison notes](comparison/class-weighted-v1/comparison_notes.md) show the trade-off. Potential Fit recall improves while Good Fit recall, No Fit recall, and accuracy decrease. The [CSV](comparison/class-weighted-v1/loss_comparison.csv) and [figure](comparison/class-weighted-v1/loss_comparison.png) preserve the comparison.
+
+This is the highest recorded validation macro-F1 among these DistilBERT variants, but the gain is small and comes from one seed. It does not establish a reliable improvement or a final deployment choice. Keep both original-input candidates available for error analysis, robustness checks, and inference measurements. Freeze the selection before official-test evaluation; the official test remains unevaluated in this contribution.
+
+### Reproduction and export
+
+Use a fresh Colab T4 runtime with the recorded package versions and the shared data-setup archive. The uploaded continuation includes the earlier reference and section-aware cells and their archive prompts. Prepare dependencies before the full run if needed. Weighted cells explicitly rebuild original inputs and move the finished section-aware model and optimizer state to CPU before loading a fresh pretrained model. Run each training cell once per independent experiment.
+
+The notebook writes artifacts under `/content/m4_training/distilbert_weighted_v1/` and downloads `distilbert_weighted_v1_reports.zip` and `distilbert_weighted_v1_model.zip`. Keep model weights separately from Git. The model archive contains the classifier, tokenizer, and weighted-run configuration. Inference uses the original M3 `prepare_text` function and paired tokenization. Class weights and the custom trainer are needed for training reproduction rather than ordinary prediction.
+
+The [reload check](experiments/distilbert-weighted-v1/reload_check.json) records exact equality of 104 state tensors, matching tokenizer/labels and configuration, and zero logit difference on two validation examples under aligned FP16 autocast. This checks export integrity. Handoff validation checks saved reports and calculations without repeating GPU training or inference.
