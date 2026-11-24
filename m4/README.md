@@ -1,6 +1,6 @@
 # Evaluation and Optimization
 
-The reference evaluation reruns paired TF-IDF with SGD on the shared M3 job-grouped splits. This provides a validation comparison with MiniLM and DistilBERT using the same source rows. Earlier M2 results use a different split and remain historical results.
+Evaluation uses the shared M3 job-grouped splits for the TF-IDF reference and a section-aware DistilBERT experiment. The reference evaluation reruns paired TF-IDF with SGD on these splits. This provides a validation comparison with MiniLM and DistilBERT using the same source rows. Earlier M2 results use a different split and remain historical results.
 
 ## Files
 
@@ -8,12 +8,15 @@ The reference evaluation reruns paired TF-IDF with SGD on the shared M3 job-grou
 |---|---|
 | [Reference evaluation notebook](notebooks/m4-reference-evaluation.ipynb) | Uploaded Colab notebook, including executed cells and outputs, unchanged |
 | [Reference experiment reports](experiments/tfidf-sgd-v1/) | Configuration, metrics, class report, confusion matrix, validation predictions, preparation checks, and reload verification |
-| [Experiment log](experiment-log.csv) | Reference run settings, measured results, and timings |
+| [Experiment log](experiment-log.csv) | Reference and section-aware run summaries, measured results, and timings |
 | [Comparison notes](comparison/comparison_notes.md) | Findings, approach differences, and limitations |
 | [Comparison CSV](comparison/reference_model_comparison.csv) | Exact validation scores for all three approaches |
 | [Comparison figure](comparison/reference_model_comparison.png) | Macro-F1 and class recall comparison |
+| [Section-aware notebook](notebooks/m4-section-aware-inputs.ipynb) | Uploaded Colab continuation with section preparation, training, and saved checks unchanged |
+| [Section-aware experiment reports](experiments/distilbert-section-v1/) | Input policy, training settings, section audits, selected-checkpoint validation reports, and reload checks |
+| [Input-policy comparison](comparison/section-aware-v1/comparison_notes.md) | Original versus section-aware DistilBERT results, decision, CSV, and figure |
 
-The notebook and all 12 files from the uploaded reports archive are preserved unchanged. The report folders contain source row identifiers and labels rather than resume or job text. Trained model files and downloaded ZIPs stay outside Git.
+The reference notebook and all 12 files from its uploaded reports archive are preserved unchanged. The section-aware notebook and all 17 files from its reports archive are also preserved unchanged. The report folders contain source row identifiers and labels rather than resume or job text. Trained model files and downloaded ZIPs stay outside Git.
 
 ## Shared evaluation protocol
 
@@ -57,4 +60,45 @@ The [reload report](experiments/tfidf-sgd-v1/reload_check.json) records equal vo
 
 ## Further evaluation
 
-Use this fixed reference when comparing class-weighted DistilBERT training and section-aware transformer inputs. Categorise validation errors, test robustness, and measure inference performance. Freeze model and preparation settings before official-test evaluation. This reference contribution supports M4; optimization and robustness evidence still require their own experiments.
+Use the fixed reference and recorded original DistilBERT results when assessing further changes. Keep class-weighted training separate from the section-aware input experiment. Categorise validation errors, test robustness, and measure inference performance. Freeze model and preparation settings before official-test evaluation. The recorded section-aware policy is not selected because it lowers macro-F1.
+
+## Section-aware input experiment
+
+The [section-aware notebook](notebooks/m4-section-aware-inputs.ipynb) continues the reference notebook, so it includes the earlier CPU reference work before the transformer cells. The uploaded code and outputs are unchanged. The existing reference notebook remains a separate reference.
+
+The experiment starts from the same pretrained DistilBERT revision, `12040accade4e8a0f71eabdb258fecc2e7e948be`, rather than continuing a fine-tuned model. Training arguments match the original DistilBERT run except for the output directory. Both use seed 42, unweighted cross-entropy, effective batch size 16, learning rate 0.00002, FP16, a three-epoch limit, validation macro-F1 selection, and early-stopping patience one. This keeps class weighting out of the input-policy comparison.
+
+### Input policy and audits
+
+The shared M3 text preparation is followed by heading detection. Training-only inspection revealed headings joined to content, such as `SkillsGuest services`, so detection supports joined headings and same-line content. The final rules recognise headings in 632 of 632 unique training resumes and 156 of 229 unique training jobs. Recognition coverage is not a manual accuracy score for section boundaries.
+
+The policy adds section labels and prioritises skills, experience, summary, education, projects, and certifications in resumes. Job inputs prioritise requirements and responsibilities. Initial content budgets are 304 resume tokens and 205 job tokens, with three pair special tokens. Each document receives section quotas first; unused space is filled in priority order and can be reassigned between documents. Unrecognised lines stay in the current section or preamble. Documents with no recognised headings use their preamble text.
+
+Only training and validation documents are prepared with this policy. The cache holds 642 unique resume texts and 280 unique job texts across those splits; 93 job texts use preamble-only fallback. These exact-text counts differ from grouping counts because group identifiers collapse case and whitespace.
+
+The [input configuration](experiments/distilbert-section-v1/section_input_config.json) records the regular expressions, priorities, quotas, package versions, and canonical manifest hash. The [allocation report](experiments/distilbert-section-v1/section_allocation.csv) records per-pair section token counts without document text. Every input fits within 512 tokens. Mean selected resume/job token counts are 316.40/192.44 for training and 327.51/181.30 for validation. Counts include inserted section labels and do not measure original-content retention. Dynamic-padding checks use an `(8, 512)` batch with 485 padding tokens and integer labels.
+
+### Measured results and decision
+
+The run reaches three epochs and 954 optimizer updates. Epoch 2, `checkpoint-636`, has the highest validation macro-F1. Training takes 275.77 seconds, about 4.60 minutes, with peak PyTorch GPU allocation of 1.95 GB. These are recorded single-run training measurements.
+
+| Input policy | Validation macro-F1 | Accuracy | Good Fit recall | Potential Fit recall | No Fit recall |
+|---|---:|---:|---:|---:|---:|
+| Original longest_first | 0.3540 | 0.4752 | 0.2107 | 0.1088 | 0.8396 |
+| Section-aware v1 | 0.3258 | 0.4786 | 0.0500 | 0.1813 | 0.8862 |
+
+Macro-F1 falls by 0.0282 absolute. The section-aware model correctly identifies 14 of 280 Good Fit examples, 60 of 331 Potential Fit examples, and 475 of 536 No Fit examples. It predicts 57 Good Fit, 138 Potential Fit, and 952 No Fit pairs. The small accuracy gain does not offset the macro-F1 and Good Fit recall losses, so the original input policy remains the stronger candidate.
+
+See the [metrics](experiments/distilbert-section-v1/validation_metrics.json), [confusion matrix](experiments/distilbert-section-v1/validation_confusion_matrix.csv), and [comparison notes](comparison/section-aware-v1/comparison_notes.md). The [comparison CSV](comparison/section-aware-v1/input_policy_comparison.csv) and [figure](comparison/section-aware-v1/input_policy_comparison.png) preserve the numeric and visual evidence. This is an unsuccessful improvement iteration rather than evidence that section-aware methods cannot help.
+
+The policy changes section selection, ordering, inserted labels, and document budget allocation together. The experiment does not isolate their individual effects. Heading rules can misinterpret unusual formats, and no specific cause of the score decrease has been established. These are single-seed validation results. Neither the original nor section-aware transformer is evaluated on official test labels here; the section policy does not process official test documents.
+
+### Reproduction and model storage
+
+1. Use a fresh Colab T4 runtime with the recorded package versions. The environment installation cell appears after the reference cells in this continuation notebook; prepare the environment before the full run if needed, and restart if loaded versions differ from installed versions.
+2. Run the notebook in order. Upload `m3_data_setup.zip` and both M3 transformer reports archives when prompted by the reference workflow. The section-aware workflow reuses the DistilBERT archive if it is still available.
+3. Verify split counts, overlaps, parser checks, section allocations, and batch shapes before training. Run the training cell once per independent experiment, starting from the pretrained checkpoint.
+4. Review selected-checkpoint validation and export checks. The notebook writes to `/content/m4_training/distilbert_section_v1/` and downloads `distilbert_section_v1_reports.zip` and `distilbert_section_v1_model.zip`.
+5. Keep the model archive separately. It contains model weights, tokenizer files, and the input configuration. Loading the checkpoint alone does not apply section preparation: inference also needs the notebook's `prepare_text`, heading parsing, section extraction, selection, and pair-building functions with the recorded policy.
+
+The [reload check](experiments/distilbert-section-v1/reload_check.json) confirms exact equality of all 104 state tensors, matching tokenizer/labels and input configuration, and zero logit difference on two validation examples under aligned FP16 autocast. This verifies export integrity. Repository validation checks the saved artifacts and calculations without repeating GPU training.

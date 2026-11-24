@@ -1,0 +1,3 @@
+Split,Rows,Minimum_tokens,Maximum_tokens,Mean_resume_tokens,Mean_job_tokens
+Training,5081,331,512,316.3975595355245,192.43967722889195
+Validation,1147,437,512,327.510897994769,181.30427201394943
