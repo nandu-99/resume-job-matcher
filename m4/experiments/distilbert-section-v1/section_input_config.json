@@ -1,0 +1,93 @@
+{
+  "run_id": "distilbert_section_v1",
+  "dataset": "cnamuangtoun/resume-job-description-fit",
+  "dataset_revision": "08978e21714984bb417547d2c0f9b477f5298163",
+  "split_manifest_sha256": "66d99385f73baafa29fd64e5652482cc5b01bea50f172b60b6dc155e2fe1bd4c",
+  "model": "distilbert/distilbert-base-uncased",
+  "model_revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+  "seed": 42,
+  "label2id": {
+    "Good Fit": 0,
+    "Potential Fit": 1,
+    "No Fit": 2
+  },
+  "policy": {
+    "name": "section_aware_v1",
+    "max_length": 512,
+    "resume_budget": 304,
+    "job_budget": 205,
+    "add_section_labels": true,
+    "resume_quotas": {
+      "skills": 80,
+      "experience": 128,
+      "summary": 32,
+      "education": 24,
+      "projects": 24,
+      "certifications": 16
+    },
+    "job_quotas": {
+      "requirements": 112,
+      "responsibilities": 64,
+      "overview": 29
+    },
+    "resume_priority": [
+      "skills",
+      "experience",
+      "summary",
+      "education",
+      "projects",
+      "certifications",
+      "preamble",
+      "requirements",
+      "responsibilities",
+      "overview",
+      "other"
+    ],
+    "job_priority": [
+      "requirements",
+      "responsibilities",
+      "skills",
+      "overview",
+      "experience",
+      "education",
+      "preamble",
+      "summary",
+      "projects",
+      "certifications",
+      "other"
+    ]
+  },
+  "heading_regex": {
+    "summary": "^(?i:(?:professional |career )?summary|profile|objective|about me)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$",
+    "skills": "^(?i:(?:(?:technical|core|key|professional) )?skills|core competencies)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$",
+    "experience": "^(?i:(?:(?:work|professional|relevant|employment) )?experience|employment history|work history)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$",
+    "projects": "^(?i:(?:(?:personal|academic|selected|relevant) )?projects)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$",
+    "education": "^(?i:education|academic background|educational qualifications)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$",
+    "certifications": "^(?i:certifications?|licenses?(?: and certifications?)?)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$",
+    "requirements": "^(?i:(?:(?:minimum|preferred|required|basic|key) )?(?:requirements|qualifications)|what you bring|what we look for)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$",
+    "responsibilities": "^(?i:(?:(?:key|job|main) )?(?:responsibilities|duties)|what you.ll do|your role)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$",
+    "overview": "^(?i:job description|job summary|job overview|about the role)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$",
+    "other": "^(?i:interests|hobbies|references|languages|benefits|about us)(?=$|[\\s:|]|[A-Z0-9])[\\s:|]*(?P<content>.*)$"
+  },
+  "text_preparation": "Shared M3 prepare_text function",
+  "heading_cleanup": "Remove leading Markdown heading/bullet and bold markers",
+  "section_truncation": "Keep the prefix within each section allowance",
+  "fallback": "Unrecognised lines remain in the current section or preamble",
+  "pair_order": [
+    "resume",
+    "job"
+  ],
+  "padding": "Dynamic, rounded to a multiple of 8",
+  "python_version": "3.13.16",
+  "package_versions": {
+    "transformers": "5.24.0",
+    "huggingface-hub": "1.33.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.15.0",
+    "torch": "2.14.1+cu130",
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "datasets": "4.8.5",
+    "scikit-learn": "1.6.1"
+  }
+}
