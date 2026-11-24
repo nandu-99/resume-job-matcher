@@ -1,0 +1,7 @@
+Model,Split,Rows,Minimum tokens,Maximum tokens,Mean tokens retained (%)
+MiniLM,Training,5081,334,512,34.76
+MiniLM,Validation,1147,437,512,37.84
+MiniLM,Official test,1759,409,512,
+DistilBERT,Training,5081,334,512,34.76
+DistilBERT,Validation,1147,437,512,37.84
+DistilBERT,Official test,1759,409,512,

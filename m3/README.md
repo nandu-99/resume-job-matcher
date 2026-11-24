@@ -18,9 +18,12 @@ The transformer experiments use a shared data-preparation workflow before tokeni
 | [MiniLM fine-tuning notebook](notebooks/m3-minilm-finetuning.ipynb) | Uploaded training notebook and saved outputs unchanged |
 | [Experiment log](experiment-log.csv) | Comparable run summaries using the shared M3 split protocol |
 | [MiniLM experiment evidence](experiments/minilm-v1/) | Training history, selected-checkpoint validation reports, run settings, and reload checks |
+<<<<<<< HEAD
 | [DistilBERT fine-tuning notebook](notebooks/m3-distilbert-finetuning.ipynb) | Uploaded Colab notebook with training, export checks, and comparison outputs unchanged |
 | [DistilBERT experiment evidence](experiments/distilbert-v1/) | Training history, validation reports, run settings, and reload checks |
 | [Model comparison](comparison/comparison_notes.md) | Findings with the numeric comparison and figure |
+=======
+>>>>>>> origin/main
 
 The three split files are the extracted contents of the Colab setup archive. The ZIP is not duplicated in the repository. No resume or job-description records are included in these artifacts.
 
@@ -158,6 +161,7 @@ No official-test predictions or metrics were produced for this MiniLM run. Token
 
 The [training arguments](experiments/minilm-v1/training_arguments.json) and [run summary](experiments/minilm-v1/run_summary.json) record the actual run. [Reload verification](experiments/minilm-v1/reload_check.json) confirms that all 201 saved state tensors match the Trainer model exactly, the tokenizer and labels match, and logits match on two validation examples under aligned FP16 autocast. The maximum recorded logit difference is zero. This checks export integrity, not model quality.
 
+<<<<<<< HEAD
 The [experiment log](experiment-log.csv) records both transformer runs. Any targeted improvement should use the same shared data protocol and report measured class-level trade-offs before a model is selected for deployment.
 
 ## DistilBERT fine-tuning and comparison
@@ -186,3 +190,6 @@ DistilBERT files are written beneath `/content/m3_training/distilbert/`; compari
 The [reload check](experiments/distilbert-v1/reload_check.json) confirms exact equality of all 104 saved state tensors, matching tokenizer and label mappings, and zero logit difference on two validation examples using aligned FP16 autocast. This verifies export integrity. The duplicate tokenization configuration from the reports archive matches the canonical [configuration](tokenization/tokenization_config.json), so it is not copied again.
 
 Further evaluation should examine class-weighted loss and section-aware inputs as separate changes, compare a TF-IDF reference under the same M3 splits, and keep official test evaluation until model selection is fixed.
+=======
+The [experiment log](experiment-log.csv) records this initial transformer result. DistilBERT and any targeted improvement should use the same shared data protocol and report their measured class-level trade-offs before a model is selected for deployment.
+>>>>>>> origin/main
