@@ -33,6 +33,7 @@ The [related-work overview](m1/related-work.md) connects the paper reviews to th
 - [Class-weighted training comparison](m4/comparison/class-weighted-v1/comparison_notes.md): training-only class weights, recorded validation gains, and class-recall trade-offs.
 - [Final evaluation](m4/evaluation/evaluation_report.md): reviewed validation errors, robustness tests, GPU inference measurements, frozen selection, and official-test results.
 - [Final evaluation notebook](m4/notebooks/m4-final-evaluation.ipynb): the unchanged executed Colab continuation and saved outputs.
+- [Model inference](m5/README.md): the reusable CPU prediction function, selected-checkpoint loading, truncation details, and verification against saved validation examples.
 
 The preparation notebook provides the data workflow and additional cleaned-pair checks. The baseline notebook retains the existing model implementation so candidate approaches can build on it. Its saved test macro-F1 values are 0.3708 for cosine similarity and 0.4100 for paired TF-IDF with SGD.
 
