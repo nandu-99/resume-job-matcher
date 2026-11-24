@@ -12,9 +12,12 @@ The inference module loads the class-weighted DistilBERT checkpoint selected bef
 | [styles.css](styles.css) | White-only appearance and mobile input layout |
 | [Theme configuration](../.streamlit/config.toml) | Light theme, white surfaces, minimal toolbar, and disabled usage telemetry |
 | [inference.py](inference.py) | Model loading, original text preparation, tokenization, prediction, and truncation information |
+| [validation.py](validation.py) | Shared input bounds and correctable input errors |
+| [service.py](service.py) | Guarded requests, safe failure categories, cache recovery, and metadata logging |
 | [requirements.txt](requirements.txt) | Pinned dependencies for the verified local CPU environment |
 | [test_inference.py](test_inference.py) | Preparation, checkpoint, CPU prediction, input, and truncation checks |
 | [test_app.py](test_app.py) | Analysis, clearing, stale-result invalidation, truncation display, and unavailable-model UI checks |
+| [test_service.py](test_service.py) | Input boundaries, failure/retry behaviour, response validation, and log-privacy checks |
 | [verification.json](verification.json) | Recorded CPU agreement with saved M4 validation predictions |
 
 ## Setup
@@ -61,7 +64,47 @@ Open the local address printed by Streamlit, normally `http://localhost:8501`. L
 
 The inference API reuses the loaded model across requests. Text and the current result stay in Streamlit session memory and are not written to files, added to query parameters, or passed to a shared data cache. Clear resets the active inputs and result; it is not a guarantee of secure memory erasure.
 
-The interface includes basic empty-field handling and neutral messages if a model cannot load or prediction fails. Internal paths and tracebacks are not displayed to the user. Detailed limits, recovery behaviour, operational logging, and deployment monitoring remain separate integration work.
+The interface validates requests before loading the model, keeps entered text after failures, and displays a support reference for model or prediction failures. Internal paths, exception details, and tracebacks are not displayed. Deployment monitoring remains separate integration work.
+
+## Validation and failure handling
+
+Each field accepts at most **50,000 characters** before preparation. The same bound applies to UI requests and direct inference calls. Oversized text is rejected rather than silently clipped, so the user can choose what to remove. The UI shows current character counts; the 512-token model window still applies separately.
+
+Inputs must be strings with text and at least one letter or number. Newlines, carriage returns, and tabs are accepted; other control characters are rejected. Both fields must still contain letters or numbers after the unchanged M3 preparation. These are input-format checks, not a judgement of resume quality or eligibility.
+
+Streamlit calls the guarded service:
+
+```python
+from m5.service import analyse_match
+
+result = analyse_match("Python developer", "Python and SQL")
+```
+
+The successful response has the same four fields as the inference API below. The service checks the label, token-count types, token bounds, and truncation flag before the UI can display a prediction.
+
+| Outcome | Behaviour |
+|---|---|
+| Invalid input | Show a field-level correction message; do not load or call the model |
+| Model loading or checkpoint verification fails | Show an unavailable message and request reference; keep entered text |
+| Prediction fails or returns an invalid result | Show a retry message and request reference; remove any previous result |
+| Successful request | Display the verified response and any shortened-input notice |
+
+Model-load and prediction failures clear the model cache. Selecting **Analyse match** again attempts a fresh load. No error is converted into a fit label, and there is no automatic retry loop. Permanent configuration problems still require a maintainer to fix the model files or environment. Editing inputs and Clear also remove the error reference.
+
+### Operational logs
+
+One JSON event is written to standard error for each handled request:
+
+- `validation_failed`
+- `model_load_failed`
+- `prediction_failed`
+- `prediction_completed`
+
+Every event contains `event`, `request_id`, `duration_ms`, `resume_chars`, and `job_chars`. Successful events also include `truncated`. Character counts describe raw input; duration includes validation, any model loading, and prediction, rather than only the neural-network forward pass. Non-string fields have a null character count.
+
+Logs exclude document text, predicted labels, exception messages, paths, and tracebacks. There is no application log file. The deployment platform may retain console output, so its retention settings still need configuration. A reference shown to the user can be matched with `request_id` without asking for document text.
+
+For `model_load_failed`, check that the selected model archive is extracted at the configured location, its files match the frozen M4 checkpoint, and dependencies are installed. For `prediction_failed`, retry once after checking the runtime; persistent failures require maintainer investigation. Do not add document text or full exception payloads to logs when troubleshooting. Process-level timeouts, concurrency policy, monitoring alerts, and hosting are deployment work.
 
 ## Prediction API
 
@@ -103,7 +146,7 @@ Preparation is copied from the original M3 workflow: Unicode NFKC, visible Markd
 
 The resume is the first sequence and the job is the second. Tokenization uses right-side `longest_first` truncation, at most 512 tokens including special tokens, and dynamic padding to a multiple of eight. DistilBERT receives input IDs and attention masks without token-type IDs. No section-aware selection is applied. Evaluation mode and inference mode disable dropout and gradient recording.
 
-Class weights and the custom Trainer are required for training reproduction, not prediction. The module rejects missing or incorrect model artifacts and non-string or empty inputs. Application limits, user-facing errors, operational logging, and recovery behaviour belong to the application integration work.
+Class weights and the custom Trainer are required for training reproduction, not prediction. The module rejects missing or incorrect model artifacts and invalid or oversized inputs. `prepare_inputs` shares pre-load preparation checks with the service. `clear_matcher_cache` supports reloading after a failed request. Application callers should use `analyse_match` when they need safe errors and operational logging; the lower-level inference API remains available.
 
 ## Verification
 
@@ -111,7 +154,7 @@ Class weights and the custom Trainer are required for training reproduction, not
 python -m unittest discover -s m5 -v
 ```
 
-The four Streamlit application tests use controlled inference responses to verify UI behaviour without treating those responses as model-quality evidence. They cover prediction and clearing, removing an old result after editing, the example/truncation flow, and an unavailable model without internal details. Run just these checks with:
+The seven Streamlit application tests use controlled inference responses to verify UI behaviour without treating those responses as model-quality evidence. They cover prediction and clearing, removing an old result after editing, the example/truncation flow, an unavailable model, oversized inputs before loading, retrying, and removing stale results after prediction errors. Run just these checks with:
 
 ```bash
 python -m unittest discover -s m5 -p test_app.py -v
@@ -126,12 +169,14 @@ RESUME_MATCHER_REVIEW_CSV="/absolute/path/to/error_review_with_text.csv" \
 
 The private CSV contains source text and stays outside the repository. The tests print case identifiers and label differences on failures, rather than document text. Without the CSV, the saved-prediction check is skipped; without model files, CPU integration checks are skipped.
 
+The seven request-service tests check both field limits, invalid inputs without model loading, exact-boundary acceptance, safe failure categories, retry/cache reset, invalid model responses, and successful/failing log privacy. With the configured model and private sample, the current suite runs 20 tests; the earlier inference-only verification record remains unchanged.
+
 The recorded local run uses Python 3.14.0, PyTorch 2.10.0, Transformers 5.3.0, and Tokenizers 0.22.2. These are CPU inference dependencies, separate from the unchanged Colab training environment. Predictions agree with all 30 saved FP16 validation labels on this selected sample. This does not establish complete validation-set equivalence or unchanged logits across hardware and versions. No training or official-test evaluation is repeated for this check.
 
 ## Use in the prototype
 
-The Streamlit interface calls `load_matcher()` and reuses its `predict_match` method. It displays the label and truncation information, with a brief description of the tool's limits and the need for human review. The module supplies no calibrated match percentage or generated explanation.
+The Streamlit interface calls `analyse_match()`, which validates the request before reusing the inference pipeline. It displays the label and truncation information, with a brief description of the tool's limits and the need for human review. The module supplies no calibrated match percentage or generated explanation.
 
 Browser checks used local Chrome and the actual saved CPU model, including the synthetic example, long-input notice, editing, and clearing. A 390-pixel viewport with a dark system preference retained white page/input backgrounds, stacked fields, and no horizontal overflow. These checks do not establish hosted response times or production concurrency performance.
 
-The [final evaluation](../m4/evaluation/evaluation_report.md) records low suitable-candidate recall and a higher official-test macro-F1 for the TF-IDF comparator. Retaining the recorded transformer selection here does not establish transformer superiority or deployment readiness. Detailed failure handling, monitoring, and hosted performance measurements remain separate contributions.
+The [final evaluation](../m4/evaluation/evaluation_report.md) records low suitable-candidate recall and a higher official-test macro-F1 for the TF-IDF comparator. Retaining the recorded transformer selection here does not establish transformer superiority or deployment readiness. Monitoring, process-level recovery, and hosted performance measurements remain separate contributions.

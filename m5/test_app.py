@@ -17,7 +17,7 @@ class StreamlitInterfaceTests(unittest.TestCase):
             "label": "Potential Fit", "truncated": False,
             "input_tokens": 12, "original_tokens": 12,
         }
-        patcher = patch("m5.inference.load_matcher", return_value=matcher)
+        patcher = patch("m5.service.load_matcher", return_value=matcher)
         patcher.start()
         self.addCleanup(patcher.stop)
         app = AppTest.from_file(str(APP_PATH), default_timeout=60).run()
@@ -69,8 +69,8 @@ class StreamlitInterfaceTests(unittest.TestCase):
 
     def test_missing_model_hides_internal_details(self):
         app, _ = self.make_app()
-        import m5.inference
-        m5.inference.load_matcher.side_effect = FileNotFoundError("/private/model/path")
+        import m5.service
+        m5.service.load_matcher.side_effect = FileNotFoundError("/private/model/path")
         self.fill_inputs(app)
         app.button(key="analyse_match").click().run()
         self.assertEqual(len(app.exception), 0)
@@ -78,6 +78,45 @@ class StreamlitInterfaceTests(unittest.TestCase):
         self.assertNotIn("/private/", app.error[0].value)
         self.assertIn("unavailable", app.error[0].value)
         self.assertEqual(app.text_area(key="resume_text").value, "Python developer")
+
+    def test_oversized_resume_does_not_load_model(self):
+        app, matcher = self.make_app()
+        import m5.service
+        app.text_area(key="resume_text").input("a" * 50_001).run()
+        app.text_area(key="job_text").input("Python and SQL").run()
+        app.button(key="analyse_match").click().run()
+        self.assertEqual(len(app.exception), 0)
+        self.assertIn("50,000", app.error[0].value)
+        m5.service.load_matcher.assert_not_called()
+        matcher.predict_match.assert_not_called()
+        self.assertEqual(len(app.text_area(key="resume_text").value), 50_001)
+
+    def test_retry_after_model_load_failure(self):
+        app, matcher = self.make_app()
+        import m5.service
+        m5.service.load_matcher.side_effect = [ValueError("private checkpoint detail"), matcher]
+        self.fill_inputs(app)
+        app.button(key="analyse_match").click().run()
+        self.assertIn("unavailable", app.error[0].value)
+        self.assertTrue(app.session_state["match_error_reference"])
+        self.assertIsNone(app.session_state["match_result"])
+        app.button(key="analyse_match").click().run()
+        self.assertEqual(len(app.exception), 0)
+        self.assertEqual(len(app.error), 0)
+        self.assertIsNone(app.session_state["match_error_reference"])
+        self.assertIn("Potential Fit", [item.value for item in app.subheader])
+
+    def test_prediction_failure_clears_old_result(self):
+        app, matcher = self.make_app()
+        self.fill_inputs(app)
+        app.button(key="analyse_match").click().run()
+        self.assertIsNotNone(app.session_state["match_result"])
+        matcher.predict_match.side_effect = RuntimeError("private document text")
+        app.button(key="analyse_match").click().run()
+        self.assertEqual(len(app.exception), 0)
+        self.assertIsNone(app.session_state["match_result"])
+        self.assertNotIn("private document", app.error[0].value)
+        self.assertTrue(app.session_state["match_error_reference"])
 
 
 if __name__ == "__main__":

@@ -34,7 +34,7 @@ The [related-work overview](m1/related-work.md) connects the paper reviews to th
 - [Final evaluation](m4/evaluation/evaluation_report.md): reviewed validation errors, robustness tests, GPU inference measurements, frozen selection, and official-test results.
 - [Final evaluation notebook](m4/notebooks/m4-final-evaluation.ipynb): the unchanged executed Colab continuation and saved outputs.
 - [Model inference](m5/README.md): the reusable CPU prediction function, selected-checkpoint loading, truncation details, and verification against saved validation examples.
-- [Streamlit interface](m5/app.py): white-theme resume and job inputs, model predictions, input-coverage notices, and example/clear actions. See the [M5 guide](m5/README.md) to run it locally.
+- [Streamlit interface](m5/app.py): white-theme resume and job inputs, bounded requests, model predictions, input-coverage notices, and safe failure messages. See the [M5 guide](m5/README.md) for setup, logging, and recovery behaviour.
 
 The preparation notebook provides the data workflow and additional cleaned-pair checks. The baseline notebook retains the existing model implementation so candidate approaches can build on it. Its saved test macro-F1 values are 0.3708 for cosine similarity and 0.4100 for paired TF-IDF with SGD.
 
