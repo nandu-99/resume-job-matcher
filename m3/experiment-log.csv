@@ -1,0 +1,3 @@
+run_id,model,epochs_run,best_epoch,validation_macro_f1,validation_accuracy,recall_good_fit,recall_potential_fit,recall_no_fit,training_wall_seconds,peak_gpu_allocated_gb,official_test_evaluated,notes
+minilm_v1,MiniLM-L12-H384,3.0,2.0,0.3081366354246464,0.46817785527462946,0.2642857142857143,0.0,0.8638059701492538,279.610189947,1.4233760833740234,False,Unweighted cross-entropy; zero Potential Fit predictions; job-grouped validation
+distilbert_v1,DistilBERT-base-uncased,3.0,2.0,0.3540327601192508,0.47515257192676547,0.21071428571428572,0.10876132930513595,0.8395522388059702,280.16195572200013,1.9487133026123047,False,Unweighted cross-entropy; selected by validation macro-F1; job-grouped validation
