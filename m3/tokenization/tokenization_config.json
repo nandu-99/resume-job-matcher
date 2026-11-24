@@ -1,0 +1,43 @@
+{
+  "dataset": "cnamuangtoun/resume-job-description-fit",
+  "dataset_revision": "08978e21714984bb417547d2c0f9b477f5298163",
+  "python_version": "3.13.16",
+  "seed": 42,
+  "max_length": 512,
+  "truncation": "longest_first",
+  "truncation_side": "right",
+  "padding": "dynamic",
+  "pad_to_multiple_of": 8,
+  "pair_order": [
+    "resume_model_text",
+    "job_model_text"
+  ],
+  "label2id": {
+    "Good Fit": 0,
+    "Potential Fit": 1,
+    "No Fit": 2
+  },
+  "checkpoints": {
+    "MiniLM": "microsoft/MiniLM-L12-H384-uncased",
+    "DistilBERT": "distilbert/distilbert-base-uncased"
+  },
+  "model_revisions": {
+    "MiniLM": "44acabbec0ef496f6dbc93adadea57f376b7c0ec",
+    "DistilBERT": "12040accade4e8a0f71eabdb258fecc2e7e948be"
+  },
+  "token_type_ids": {
+    "MiniLM": true,
+    "DistilBERT": false
+  },
+  "package_versions": {
+    "transformers": "5.24.0",
+    "huggingface-hub": "1.33.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.15.0",
+    "datasets": "4.8.5",
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.6.1",
+    "torch": "2.14.1+cu130"
+  }
+}
