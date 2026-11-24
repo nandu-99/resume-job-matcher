@@ -1,0 +1,27 @@
+{
+  "run_id": "distilbert_weighted_v1",
+  "model": "distilbert/distilbert-base-uncased",
+  "model_revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+  "dataset_revision": "08978e21714984bb417547d2c0f9b477f5298163",
+  "seed": 42,
+  "loss": "class-weighted cross-entropy",
+  "input_policy": "original_longest_first",
+  "split_rows": {
+    "Training": 5081,
+    "Validation": 1147,
+    "Official test": 1759
+  },
+  "epochs_run": 3.0,
+  "best_checkpoint": "checkpoint-636",
+  "best_validation_macro_f1": 0.35820353666628063,
+  "optimizer_updates": 954,
+  "training_wall_seconds": 307.41885549200015,
+  "peak_gpu_allocated_gb": 1.94504976272583,
+  "validation_prediction_counts": {
+    "Good Fit": 160,
+    "Potential Fit": 166,
+    "No Fit": 821
+  },
+  "class_weights_from_training_only": true,
+  "official_test_evaluated": false
+}

@@ -30,6 +30,7 @@ The [related-work overview](m1/related-work.md) connects the paper reviews to th
 - [Transformer comparison](m3/comparison/comparison_notes.md): shared-protocol results and class-level trade-offs.
 - [Evaluation and optimization](m4/README.md): shared-split reference evaluation, a section-aware input experiment, saved predictions, and model comparisons.
 - [Section-aware input comparison](m4/comparison/section-aware-v1/comparison_notes.md): the input-policy experiment, class-level results, and the decision to retain the original DistilBERT policy.
+- [Class-weighted training comparison](m4/comparison/class-weighted-v1/comparison_notes.md): training-only class weights, recorded validation gains, and class-recall trade-offs.
 
 The preparation notebook provides the data workflow and additional cleaned-pair checks. The baseline notebook retains the existing model implementation so candidate approaches can build on it. Its saved test macro-F1 values are 0.3708 for cosine similarity and 0.4100 for paired TF-IDF with SGD.
 
@@ -44,3 +45,5 @@ Download the dataset through the notebook. Do not commit raw or cleaned resume r
 Paired TF-IDF with SGD achieves validation macro-F1 0.2923 on the M3 splits, compared with MiniLM at 0.3081 and DistilBERT at 0.3540. TF-IDF retains the highest Potential Fit recall, while MiniLM has the highest Good Fit recall. All three approaches miss many suitable candidates. The [comparison notes](m4/comparison/comparison_notes.md) explain preprocessing differences and limitations. Official-test evaluation remains held back until model selection is fixed.
 
 The section-aware DistilBERT experiment achieves validation macro-F1 0.3258, below the original 0.3540. Potential Fit recall increases, while Good Fit recall falls to 0.0500. The original input policy remains the stronger candidate. The [M4 guide](m4/README.md) records this improvement attempt, its configuration, and its limitations.
+
+Class-weighted DistilBERT with the original input policy reaches validation macro-F1 0.3582, compared with 0.3540 for the unweighted run. The small gain comes with lower Good Fit recall and accuracy. It remains a candidate for further evaluation, with the official test set held back until selection is fixed.
