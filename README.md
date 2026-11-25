@@ -34,6 +34,7 @@ The [related-work overview](m1/related-work.md) connects the paper reviews to th
 - [Final evaluation](m4/evaluation/evaluation_report.md): reviewed validation errors, robustness tests, GPU inference measurements, frozen selection, and official-test results.
 - [Final evaluation notebook](m4/notebooks/m4-final-evaluation.ipynb): the unchanged executed Colab continuation and saved outputs.
 - [Model inference](m5/README.md): the reusable CPU prediction function, selected-checkpoint loading, truncation details, and verification against saved validation examples.
+- [PDF upload and OCR](m5/PDF_INPUT.md): text extraction and English neural OCR for resume and job PDFs, with editable review and bounded processing.
 - [Streamlit deployment](m5/DEPLOYMENT.md): model hosting, secrets, publishing steps, hosted verification, and CPU performance measurements.
 - [Streamlit interface](m5/app.py): white-theme resume and job inputs, bounded requests, model predictions, input-coverage notices, and safe failure messages. See the [M5 guide](m5/README.md) for setup, logging, and recovery behaviour.
 

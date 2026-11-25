@@ -98,6 +98,8 @@ class StreamlitInterfaceTests(unittest.TestCase):
         self.fill_inputs(app)
         app.button(key="analyse_match").click().run()
         self.assertIn("unavailable", app.error[0].value)
+        self.assertIsNone(app.session_state["pending_action"])
+        self.assertFalse(app.button(key="analyse_match").disabled)
         self.assertTrue(app.session_state["match_error_reference"])
         self.assertIsNone(app.session_state["match_result"])
         app.button(key="analyse_match").click().run()
