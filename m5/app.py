@@ -4,7 +4,8 @@ from pathlib import Path
 
 import streamlit as st
 
-from m5.inference import load_matcher
+from m5.service import MatchError, analyse_match
+from m5.validation import InputValidationError, MAX_INPUT_CHARACTERS
 
 
 EXAMPLE_RESUME = """Software developer with five years of backend development experience.
@@ -28,6 +29,7 @@ RESULT_COPY = {
 def clear_result():
     st.session_state["match_result"] = None
     st.session_state["match_error"] = None
+    st.session_state["match_error_reference"] = None
 
 
 def use_example():
@@ -53,7 +55,7 @@ def main():
 
     for key, default in {
         "resume_text": "", "job_text": "",
-        "match_result": None, "match_error": None,
+        "match_result": None, "match_error": None, "match_error_reference": None,
     }.items():
         st.session_state.setdefault(key, default)
 
@@ -73,14 +75,20 @@ def main():
                 placeholder="Paste the candidate's experience, skills, and education...",
                 on_change=clear_result,
             )
-            st.caption("Include experience, skills, and education.")
+            st.caption(
+                f"{len(resume):,} / {MAX_INPUT_CHARACTERS:,} characters. "
+                "Include experience, skills, and education."
+            )
         with job_column:
             job = st.text_area(
                 "Job description", key="job_text", height=280,
                 placeholder="Paste the role, responsibilities, and required qualifications...",
                 on_change=clear_result,
             )
-            st.caption("Include responsibilities and required qualifications.")
+            st.caption(
+                f"{len(job):,} / {MAX_INPUT_CHARACTERS:,} characters. "
+                "Include responsibilities and required qualifications."
+            )
 
     ready = bool(resume.strip() and job.strip())
     if st.button(
@@ -89,20 +97,12 @@ def main():
         clear_result()
         try:
             with st.spinner("Analysing the resume and job description..."):
-                matcher = load_matcher(device="cpu")
-                st.session_state["match_result"] = matcher.predict_match(resume, job)
-        except FileNotFoundError:
-            st.session_state["match_error"] = (
-                "The matching model is unavailable. Please try again later."
-            )
-        except (TypeError, ValueError):
-            st.session_state["match_error"] = (
-                "We couldn't analyse this text. Check both fields and try again."
-            )
-        except Exception:
-            st.session_state["match_error"] = (
-                "Matching is unavailable right now. Your text has been kept so you can try again."
-            )
+                st.session_state["match_result"] = analyse_match(resume, job)
+        except InputValidationError as error:
+            st.session_state["match_error"] = str(error)
+        except MatchError as error:
+            st.session_state["match_error"] = str(error)
+            st.session_state["match_error_reference"] = error.request_id
 
     if not ready:
         st.caption("Add both texts to enable analysis.")
@@ -114,6 +114,8 @@ def main():
         st.caption("Match result")
         if error:
             st.error(error)
+            if st.session_state["match_error_reference"]:
+                st.caption(f"Reference: {st.session_state['match_error_reference']}")
         elif result:
             st.subheader(result["label"])
             st.write(RESULT_COPY[result["label"]])
@@ -140,8 +142,12 @@ def main():
         )
         st.write(
             "Use the prediction alongside your own assessment. Text and results remain in this "
-            "session's memory; the interface does not save them to files or logs. "
+            "session's memory; the interface does not save document text or results to files or logs. "
             "Clear removes them from the active interface."
+        )
+        st.caption(
+            "Operational logs contain a request reference, outcome, character counts, "
+            "and elapsed time. They exclude document text, predictions, and exception details."
         )
 
 

@@ -13,6 +13,8 @@ import unicodedata
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
+from m5.validation import InputValidationError, validate_inputs
+
 
 LABELS = ("Good Fit", "Potential Fit", "No Fit")
 MAX_LENGTH = 512
@@ -40,6 +42,15 @@ def prepare_text(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     text = re.sub(r"[^\S\n]+", " ", text)
     return re.sub(r"\n\s*\n+", "\n", text).strip()
+
+
+def prepare_inputs(resume_text: str, job_text: str) -> tuple[str, str]:
+    validate_inputs(resume_text, job_text)
+    resume, job = prepare_text(resume_text), prepare_text(job_text)
+    for name, text in (("Resume", resume), ("Job description", job)):
+        if not text or not any(character.isalnum() for character in text):
+            raise InputValidationError(f"{name} must contain text after preparation.")
+    return resume, job
 
 
 def resolve_model_dir(model_dir: str | Path | None = None) -> Path:
@@ -107,15 +118,7 @@ class ResumeJobMatcher:
         self._lock = Lock()
 
     def predict_match(self, resume_text: str, job_text: str) -> dict:
-        for name, text in (("Resume", resume_text), ("Job description", job_text)):
-            if not isinstance(text, str):
-                raise TypeError(f"{name} must be a string.")
-            if not text.strip():
-                raise ValueError(f"{name} must not be empty.")
-
-        resume, job = prepare_text(resume_text), prepare_text(job_text)
-        if not resume or not job:
-            raise ValueError("Both inputs must contain text after preparation.")
+        resume, job = prepare_inputs(resume_text, job_text)
 
         # Tokenizer settings are mutable, so shared instances serialise prediction calls.
         with self._lock:
@@ -164,8 +167,14 @@ def load_matcher(
     return _cached_matcher(str(resolve_model_dir(model_dir)), device)
 
 
+def clear_matcher_cache() -> None:
+    """Discard the cached instance so the next request can reload the model."""
+    _cached_matcher.cache_clear()
+
+
 def predict_match(
     resume_text: str, job_text: str, *,
     model_dir: str | Path | None = None, device: str = "cpu",
 ) -> dict:
+    prepare_inputs(resume_text, job_text)
     return load_matcher(model_dir, device=device).predict_match(resume_text, job_text)
