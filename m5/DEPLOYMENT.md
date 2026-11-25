@@ -1,6 +1,6 @@
 # Streamlit deployment
 
-The application is prepared for Streamlit Community Cloud. Publishing and hosted verification are still to be done by the maintainer. The frozen class-weighted checkpoint and white interface are unchanged.
+The application is prepared for Streamlit Community Cloud. The maintainer has supplied the live URL and Linux CPU performance results in the [deployment record](performance/README.md). Remaining hosted acceptance checks are listed there. The frozen class-weighted checkpoint and white interface are unchanged.
 
 ## 1. Store the selected model
 
@@ -38,7 +38,7 @@ HF_TOKEN = "YOUR_READ_ONLY_TOKEN"
 PERFORMANCE_TOKEN = "YOUR_LONG_RANDOM_MAINTAINER_PASSWORD"
 ```
 
-The example file is [.streamlit/secrets.toml.example](../.streamlit/secrets.toml.example). Never commit actual secrets. Root-level Streamlit secrets provide the environment settings consumed by the downloader. The root requirements file includes the pinned M5 dependencies and selects the PyTorch CPU wheel on Linux, using the official CPU package index. It does not install the older baseline environment. No system package file is required.
+The example file is [.streamlit/secrets.toml.example](../.streamlit/secrets.toml.example). Never commit actual secrets. Root-level Streamlit secrets provide the environment settings consumed by the downloader. The root requirements file includes the pinned M5 dependencies and selects the PyTorch CPU wheel on Linux, using the official CPU package index. It does not install the older baseline environment. The root `packages.txt` installs Tesseract and its English language model for scanned-PDF OCR.
 
 Only the four inference files are downloaded, on the first valid model request when local artifacts are missing. Downloads use a pinned commit and the model loader still checks the selected weight hash. A complete local model remains usable without Hub credentials. Files and the loaded model are reused on that instance; restarts or instance replacement can require downloading again. Do not rely on hosted local disk as permanent storage.
 
@@ -92,3 +92,7 @@ Open Community Cloud's app management logs. Each request records a reference, ev
 - Process killed or out of memory: inspect platform logs and restart. Python cannot safely catch every process-level failure. Reduce usage or move to a larger CPU host if the model does not fit.
 
 Restrict access to platform logs and credentials. Review the platform's retention settings. No automated alerts, rate limiter, hard request timeout, or multi-user load guarantee is implemented. Shared inference serializes calls, and concurrent requests can queue. This is a demonstration with human review, not an automated hiring service.
+
+## PDF upload update
+
+The app also accepts PDF resumes and job descriptions. See the [PDF guide](PDF_INPUT.md). Deploy the new Python dependencies and root system packages, then check text PDFs, scanned PDFs, and a PDF resume paired with a pasted job description. Existing model secrets stay the same. The earlier hosted benchmark measures text prediction and excludes PDF/OCR work.

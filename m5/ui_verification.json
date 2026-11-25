@@ -1,0 +1,549 @@
+{
+  "recorded_date": "2026-11-25",
+  "test_suite_passed": 38,
+  "saved_validation_prediction_checks": 30,
+  "browser": "Local headless Chrome",
+  "model": "Saved class-weighted DistilBERT on CPU",
+  "scope": "Local alignment, actual model prediction and PDF interaction checks; not hosted verification or timing evidence",
+  "desktop_viewports": [
+    [
+      1440,
+      900
+    ],
+    [
+      1366,
+      768
+    ]
+  ],
+  "mobile_viewports": [
+    [
+      390,
+      844
+    ],
+    [
+      320,
+      844
+    ]
+  ],
+  "alignment_assertions": {
+    "maximum_editor_top_difference_px": 1,
+    "maximum_panel_height_difference_px": 1,
+    "minimum_result_heading_body_gap_px": 7,
+    "unclipped_editor_parent_radius": "0px"
+  },
+  "checks": {
+    "desktop_empty": {
+      "resume": {
+        "panel": {
+          "x": 120,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 136,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 136,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 136,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 137,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "job": {
+        "panel": {
+          "x": 736,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 752,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 752,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 752,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 753,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "result": {
+        "x": 120,
+        "y": 586.578125,
+        "w": 1200,
+        "h": 121.1875,
+        "bottom": 707.765625
+      },
+      "resultHeading": {
+        "x": 136,
+        "y": 628.578125,
+        "w": 1168,
+        "h": 31.1875,
+        "bottom": 659.765625
+      },
+      "resultBody": {
+        "x": 136,
+        "y": 667.765625,
+        "w": 1168,
+        "h": 24,
+        "bottom": 691.765625
+      },
+      "overflow": false
+    },
+    "desktop_prediction": {
+      "resume": {
+        "panel": {
+          "x": 120,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 136,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 136,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 136,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 137,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "job": {
+        "panel": {
+          "x": 736,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 752,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 752,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 752,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 753,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "result": {
+        "x": 120,
+        "y": 586.578125,
+        "w": 1200,
+        "h": 147.1875,
+        "bottom": 733.765625
+      },
+      "resultHeading": {
+        "x": 136,
+        "y": 628.578125,
+        "w": 1168,
+        "h": 31.1875,
+        "bottom": 659.765625
+      },
+      "resultBody": {
+        "x": 136,
+        "y": 667.765625,
+        "w": 1168,
+        "h": 24,
+        "bottom": 691.765625
+      },
+      "overflow": false
+    },
+    "desktop_mixed_input": {
+      "resume": {
+        "panel": {
+          "x": 120,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 136,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 136,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 136,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 137,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "job": {
+        "panel": {
+          "x": 736,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 752,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 752,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 752,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 753,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "result": {
+        "x": 120,
+        "y": 586.578125,
+        "w": 1200,
+        "h": 121.1875,
+        "bottom": 707.765625
+      },
+      "resultHeading": {
+        "x": 136,
+        "y": 628.578125,
+        "w": 1168,
+        "h": 31.1875,
+        "bottom": 659.765625
+      },
+      "resultBody": {
+        "x": 136,
+        "y": 667.765625,
+        "w": 1168,
+        "h": 24,
+        "bottom": 691.765625
+      },
+      "overflow": false
+    },
+    "desktop_two_pdfs": {
+      "resume": {
+        "panel": {
+          "x": 120,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 136,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 136,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 136,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 137,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "job": {
+        "panel": {
+          "x": 736,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 752,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 752,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 752,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 753,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "result": {
+        "x": 120,
+        "y": 586.578125,
+        "w": 1200,
+        "h": 121.1875,
+        "bottom": 707.765625
+      },
+      "resultHeading": {
+        "x": 136,
+        "y": 628.578125,
+        "w": 1168,
+        "h": 31.1875,
+        "bottom": 659.765625
+      },
+      "resultBody": {
+        "x": 136,
+        "y": 667.765625,
+        "w": 1168,
+        "h": 24,
+        "bottom": 691.765625
+      },
+      "overflow": false
+    },
+    "pdf_source_reopens": true,
+    "desktop_1366x768": {
+      "resume": {
+        "panel": {
+          "x": 83,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 99,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 99,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 99,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 100,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "job": {
+        "panel": {
+          "x": 699,
+          "y": 152.1875,
+          "w": 584,
+          "h": 362,
+          "bottom": 514.1875
+        },
+        "heading": {
+          "x": 715,
+          "y": 168.1875,
+          "w": 552,
+          "h": 28,
+          "bottom": 196.1875
+        },
+        "marker": {
+          "x": 715,
+          "y": 170.1875,
+          "w": 24,
+          "h": 24,
+          "bottom": 194.1875
+        },
+        "source": {
+          "x": 715,
+          "y": 252.1875,
+          "w": 552,
+          "h": 44,
+          "bottom": 296.1875
+        },
+        "editor": {
+          "x": 716,
+          "y": 309.1875,
+          "w": 550,
+          "h": 158,
+          "bottom": 467.1875
+        },
+        "editorParentRadius": "0px"
+      },
+      "result": {
+        "x": 83,
+        "y": 586.578125,
+        "w": 1200,
+        "h": 121.1875,
+        "bottom": 707.765625
+      },
+      "resultHeading": {
+        "x": 99,
+        "y": 628.578125,
+        "w": 1168,
+        "h": 31.1875,
+        "bottom": 659.765625
+      },
+      "resultBody": {
+        "x": 99,
+        "y": 667.765625,
+        "w": 1168,
+        "h": 24,
+        "bottom": 691.765625
+      },
+      "overflow": false
+    },
+    "mobile_390": {
+      "white": true,
+      "overflow": false,
+      "stacked": true,
+      "header_actions_aligned": true
+    },
+    "mobile_320": {
+      "white": true,
+      "overflow": false,
+      "stacked": true,
+      "header_actions_aligned": true
+    }
+  }
+}
