@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "scope": "CPU guarded service, synthetic example, sequential requests; excludes browser/network/rendering",
+  "python": "3.14.0",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "torch_threads": 4,
+  "versions": {
+    "torch": "2.10.0",
+    "transformers": "5.3.0",
+    "tokenizers": "0.22.2",
+    "streamlit": "1.67.0",
+    "huggingface-hub": "1.7.2",
+    "psutil": "7.2.2"
+  },
+  "weights_sha256": "004d162ccc9daa4311ff9edeecb1e860a3638a5d0e0c530f5a929df7a40d4b72",
+  "model_load_seconds": 0.7306,
+  "model_load_scope": "includes provision/download if absent, hash verification and CPU loading; imports excluded",
+  "first_request_ms_after_load": 217.763,
+  "warm_requests": 20,
+  "warm_median_ms": 29.219,
+  "warm_p95_ms": 40.956,
+  "warm_mean_ms": 31.609,
+  "rss_baseline_mib": 420.27,
+  "sampled_peak_rss_mib": 535.91,
+  "memory_scope": "whole process RSS sampled every 10 ms; imports included; not a guaranteed peak"
+}

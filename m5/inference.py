@@ -14,6 +14,7 @@ import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from m5.validation import InputValidationError, validate_inputs
+from m5.deployment import provision_model
 
 
 LABELS = ("Good Fit", "Potential Fit", "No Fit")
@@ -157,6 +158,7 @@ class ResumeJobMatcher:
 
 @lru_cache(maxsize=1)
 def _cached_matcher(model_dir: str, device: str) -> ResumeJobMatcher:
+    provision_model(model_dir)
     return ResumeJobMatcher(model_dir, device=device)
 
 

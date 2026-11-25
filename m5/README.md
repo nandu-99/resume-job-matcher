@@ -4,6 +4,10 @@ The Streamlit interface accepts resume and job-description text, calls the exist
 
 The inference module loads the class-weighted DistilBERT checkpoint selected before M4 test evaluation. It provides the prediction function for the Streamlit application. The [selection record](../m4/evaluation/model_selection.json) remains the source of the expected weight hash and input policy.
 
+## Deployment
+
+Use the root `streamlit_app.py` entry point for Community Cloud. Follow the [deployment guide](DEPLOYMENT.md) for private model hosting, pinned downloads, secrets, publishing, and the protected hosted performance check. The [performance report](performance/README.md) separates measured local results from pending hosted results. The default local-file workflow below still works.
+
 ## Files
 
 | File | Purpose |
@@ -41,7 +45,7 @@ m5/artifacts/distilbert_weighted_v1/
   weighted_run_config.json
 ```
 
-The existing Git ignore rules exclude `artifacts/`. Keep the model archive and private review CSV outside Git. No public model download link is configured. Loading uses local files and verifies the weights against the frozen selection before accepting the model.
+The existing Git ignore rules exclude `artifacts/`. Keep the model archive and private review CSV outside Git. No public model download link is configured. Optional deployment settings provision the four inference files from a pinned private Hub snapshot. Loading verifies the weights against the frozen selection before accepting the model.
 
 To use another local location, set `RESUME_MATCHER_MODEL_DIR` to the extracted folder or pass `model_dir` explicitly. Keep the repository's `m4/evaluation/model_selection.json` alongside this module when deploying.
 
@@ -64,7 +68,7 @@ Open the local address printed by Streamlit, normally `http://localhost:8501`. L
 
 The inference API reuses the loaded model across requests. Text and the current result stay in Streamlit session memory and are not written to files, added to query parameters, or passed to a shared data cache. Clear resets the active inputs and result; it is not a guarantee of secure memory erasure.
 
-The interface validates requests before loading the model, keeps entered text after failures, and displays a support reference for model or prediction failures. Internal paths, exception details, and tracebacks are not displayed. Deployment monitoring remains separate integration work.
+The interface validates requests before loading the model, keeps entered text after failures, and displays a support reference for model or prediction failures. Internal paths, exception details, and tracebacks are not displayed. See the deployment guide for console monitoring and recovery.
 
 ## Validation and failure handling
 
@@ -104,7 +108,7 @@ Every event contains `event`, `request_id`, `duration_ms`, `resume_chars`, and `
 
 Logs exclude document text, predicted labels, exception messages, paths, and tracebacks. There is no application log file. The deployment platform may retain console output, so its retention settings still need configuration. A reference shown to the user can be matched with `request_id` without asking for document text.
 
-For `model_load_failed`, check that the selected model archive is extracted at the configured location, its files match the frozen M4 checkpoint, and dependencies are installed. For `prediction_failed`, retry once after checking the runtime; persistent failures require maintainer investigation. Do not add document text or full exception payloads to logs when troubleshooting. Process-level timeouts, concurrency policy, monitoring alerts, and hosting are deployment work.
+For `model_load_failed`, check that the selected model archive is extracted at the configured location, its files match the frozen M4 checkpoint, and dependencies are installed. For `prediction_failed`, retry once after checking the runtime; persistent failures require maintainer investigation. Do not add document text or full exception payloads to logs when troubleshooting. The deployment guide covers hosting and manual monitoring; automated alerts and hard request timeouts are not implemented.
 
 ## Prediction API
 
@@ -179,4 +183,4 @@ The Streamlit interface calls `analyse_match()`, which validates the request bef
 
 Browser checks used local Chrome and the actual saved CPU model, including the synthetic example, long-input notice, editing, and clearing. A 390-pixel viewport with a dark system preference retained white page/input backgrounds, stacked fields, and no horizontal overflow. These checks do not establish hosted response times or production concurrency performance.
 
-The [final evaluation](../m4/evaluation/evaluation_report.md) records low suitable-candidate recall and a higher official-test macro-F1 for the TF-IDF comparator. Retaining the recorded transformer selection here does not establish transformer superiority or deployment readiness. Monitoring, process-level recovery, and hosted performance measurements remain separate contributions.
+The [final evaluation](../m4/evaluation/evaluation_report.md) records low suitable-candidate recall and a higher official-test macro-F1 for the TF-IDF comparator. Retaining the recorded transformer selection here does not establish transformer superiority or deployment readiness. The deployment guide records manual monitoring and recovery steps. Hosted measurements remain pending until the maintainer deploys and collects them.

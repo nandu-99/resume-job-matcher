@@ -11,3 +11,6 @@ data/
 artifacts/
 *.joblib
 *.pkl
+
+# Deployment credentials stay outside Git.
+.streamlit/secrets.toml

@@ -1,0 +1,4 @@
+# Community Cloud uses Linux CPUs. Avoid installing CUDA runtime packages.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.10.0+cpu; sys_platform == "linux"
+-r m5/requirements.txt
