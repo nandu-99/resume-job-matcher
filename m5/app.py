@@ -128,7 +128,7 @@ def document_panel(prefix, title, number, busy):
     with st.container(border=True, key=f"{prefix}_panel"):
         st.markdown(
             f'<div class="document-heading"><span class="document-number">{number}</span>'
-            f'<h2>{title}</h2><span class="document-state">{status}</span></div>',
+            f'<h2>{title}</h2><span class="document-state {"is-ready" if ready else "is-waiting"}">{status}</span></div>',
             unsafe_allow_html=True,
         )
         st.radio(
@@ -208,7 +208,16 @@ def result_panel():
                 return
             result = st.session_state["match_result"]
             error = st.session_state["match_error"]
-            st.caption("Match result")
+            tone = {"Good Fit": "good", "Potential Fit": "potential", "No Fit": "no-fit"}.get(
+                result["label"] if result else "", "empty"
+            )
+            if error:
+                tone = "error"
+            st.markdown(
+                f'<div class="result-meta result-tone-{tone}"><span>Match result</span>'
+                f'<span>{"Model prediction" if result and not error else "Document review"}</span></div>',
+                unsafe_allow_html=True,
+            )
             if error:
                 st.error(error)
                 if st.session_state["match_error_reference"]:

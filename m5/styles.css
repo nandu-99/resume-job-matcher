@@ -1,11 +1,17 @@
-/* White document workspace. Direction informed by unslop by Damir Sokolovsky,
+/* White document workspace with restrained review colors. Informed by unslop by Damir Sokolovsky,
    https://x.com/heydamir, CC BY 4.0. See UI_DESIGN.md for the audit. */
 :root {
     color-scheme: light;
-    --ink: #202422;
-    --secondary: #535b56;
-    --muted: #68716b;
-    --line: #dde2de;
+    --ink: #202824;
+    --secondary: #505e57;
+    --muted: #65736b;
+    --line: #dce4df;
+    --accent: #1d655a;
+    --accent-hover: #164f47;
+    --accent-soft: #edf5f2;
+    --positive: #30654e;
+    --caution: #85571d;
+    --negative: #8d493d;
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -46,7 +52,7 @@ p, button, textarea, input {
 }
 
 .st-key-page_heading {
-    padding-bottom: 16px;
+    padding-bottom: 20px;
     margin-bottom: 8px;
     border-bottom: 1px solid var(--line);
 }
@@ -64,6 +70,7 @@ p, button, textarea, input {
     font-variant-numeric: tabular-nums;
     letter-spacing: 0;
     margin: 0;
+    opacity: 1;
 }
 
 .st-key-resume_panel, .st-key-job_panel {
@@ -76,6 +83,11 @@ p, button, textarea, input {
 .st-key-job_panel {
     border-color: var(--line) !important;
     gap: 12px;
+}
+
+.st-key-resume_panel:has(.is-ready),
+.st-key-job_panel:has(.is-ready) {
+    border-color: #c4d7cf !important;
 }
 
 .st-key-resume_source_row,
@@ -106,10 +118,11 @@ p, button, textarea, input {
     height: 24px;
     display: grid;
     place-items: center;
-    border: 1px solid var(--line);
+    background: var(--accent-soft);
+    border: 1px solid #d4e4de;
     border-radius: 4px;
     font: 12px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
-    color: var(--secondary);
+    color: var(--accent);
 }
 
 .document-state {
@@ -117,6 +130,25 @@ p, button, textarea, input {
     color: var(--muted);
     font-size: 12px;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.document-state::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #a5b0a9;
+}
+
+.document-state.is-ready {
+    color: var(--accent);
+}
+
+.document-state.is-ready::before {
+    background: var(--accent);
 }
 
 [data-testid="stRadio"], [data-testid="stCheckbox"],
@@ -143,7 +175,7 @@ p, button, textarea, input {
     font-size: 14px;
     line-height: 1.65;
     padding: 12px 16px;
-    caret-color: var(--ink);
+    caret-color: var(--accent);
 }
 
 [data-testid="stTextAreaRootElement"],
@@ -173,8 +205,8 @@ button[kind="primary"], button[kind="secondary"],
 
 button[kind="primary"] {
     min-width: 176px;
-    background: var(--ink) !important;
-    border-color: var(--ink) !important;
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
     color: #ffffff !important;
     font-weight: 500;
 }
@@ -185,24 +217,26 @@ button[kind="primary"] p {
 
 button[kind="secondary"]:hover,
 [data-testid="stPopoverButton"]:hover {
-    border-color: #7f8982 !important;
+    border-color: #89aaa0 !important;
+    background: #f4f8f6 !important;
 }
 
 button[kind="primary"]:hover {
-    background: #3b443e !important;
+    background: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
 }
 
 button:disabled, button[kind="primary"]:disabled,
 button[kind="primary"]:disabled p {
-    background: #ffffff !important;
-    color: #7b847e !important;
+    background: #f3f6f4 !important;
+    color: #65736b !important;
     border-color: var(--line) !important;
     cursor: not-allowed;
 }
 
 button:focus-visible, textarea:focus-visible,
 input:focus-visible, summary:focus-visible {
-    outline: 2px solid #626f65 !important;
+    outline: 2px solid var(--accent) !important;
     outline-offset: 3px;
 }
 
@@ -212,8 +246,43 @@ input:focus-visible, summary:focus-visible {
 }
 
 .st-key-result_panel {
-    background: #ffffff !important;
+    background: #f7f9f8 !important;
     border-radius: 12px;
+    border-color: var(--line) !important;
+    border-left: 4px solid #a7b9af !important;
+}
+
+.result-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 20px;
+}
+
+.result-meta span:last-child {
+    font-variant-numeric: tabular-nums;
+}
+
+.st-key-result_panel:has(.result-tone-good) {
+    background: #f0f7f3 !important;
+    border-color: #cfdfd5 !important;
+    border-left-color: var(--positive) !important;
+}
+
+.st-key-result_panel:has(.result-tone-potential) {
+    background: #fcf7ee !important;
+    border-color: #e7dcc8 !important;
+    border-left-color: var(--caution) !important;
+}
+
+.st-key-result_panel:has(.result-tone-no-fit),
+.st-key-result_panel:has(.result-tone-error) {
+    background: #fcf4f1 !important;
+    border-color: #e8d6cf !important;
+    border-left-color: var(--negative) !important;
 }
 
 .st-key-result_panel [data-testid="stVerticalBlock"] {
@@ -228,6 +297,18 @@ input:focus-visible, summary:focus-visible {
     font-weight: 400;
     letter-spacing: 0;
     padding: 0 !important;
+}
+
+.st-key-result_panel:has(.result-tone-good) h3 {
+    color: var(--positive) !important;
+}
+
+.st-key-result_panel:has(.result-tone-potential) h3 {
+    color: var(--caution) !important;
+}
+
+.st-key-result_panel:has(.result-tone-no-fit) h3 {
+    color: var(--negative) !important;
 }
 
 .st-key-result_panel p {
@@ -250,7 +331,7 @@ input:focus-visible, summary:focus-visible {
 }
 
 input[type="radio"], input[type="checkbox"] {
-    accent-color: var(--ink);
+    accent-color: var(--accent);
 }
 
 @media (max-width: 700px) {
