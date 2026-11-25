@@ -1,8 +1,13 @@
 """Synthetic PDF/OCR integration and failure checks. No personal documents."""
 
 import io
+import json
+import os
+from pathlib import Path
 import shutil
 import subprocess
+import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -80,6 +85,27 @@ class PDFBoundaryTests(unittest.TestCase):
 
 @unittest.skipIf(canvas is None, "Install m5/requirements-test.txt for synthetic PDF integration checks.")
 class PDFIntegrationTests(unittest.TestCase):
+    def test_worker_reads_pdf_when_app_is_launched_outside_repository(self):
+        repo = Path(__file__).resolve().parent.parent
+        script = (
+            "import json, sys; "
+            f"sys.path.insert(0, {str(repo)!r}); "
+            "from m5.pdf_input import extract_pdf; "
+            "report = extract_pdf(sys.stdin.buffer.read()); "
+            "print(json.dumps({'text': report.text, 'pages': report.pages}))"
+        )
+        env = os.environ.copy()
+        env.pop("PYTHONPATH", None)
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, "-c", script], input=make_pdf(),
+                capture_output=True, cwd=directory, env=env, timeout=70,
+            )
+        self.assertEqual(result.returncode, 0, result.stderr.decode(errors="replace"))
+        report = json.loads(result.stdout)
+        self.assertEqual(report["pages"], 1)
+        self.assertIn(SYNTHETIC_LINE, report["text"])
+
     def test_embedded_text_needs_no_ocr(self):
         report = extract_pdf(make_pdf())
         self.assertIn(SYNTHETIC_LINE, report.text)

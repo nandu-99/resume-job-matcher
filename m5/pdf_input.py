@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 import json
+from pathlib import Path
 import subprocess
 import sys
 from threading import BoundedSemaphore
@@ -50,6 +51,7 @@ def _extract_pdf(content: bytes, *, force_ocr: bool = False) -> ExtractedPDF:
         completed = subprocess.run(
             command, input=content, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             timeout=PDF_TIMEOUT_SECONDS, check=False,
+            cwd=Path(__file__).resolve().parent.parent,
         )
         response = json.loads(completed.stdout) if completed.returncode == 0 else {}
     except subprocess.TimeoutExpired:
