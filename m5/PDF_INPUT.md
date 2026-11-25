@@ -57,6 +57,6 @@ On Debian/Ubuntu, install the two packages from `packages.txt` through the syste
 
 The tests use synthetic documents, not personal resumes. They check readable content and correct extraction routes, not field-level accuracy, character error rate, or recruiter quality. Existing M4 evaluation and classifier weights remain unchanged. Existing hosted timing reports cover text-service requests; they exclude PDF upload, rendering, and OCR. Recheck hosted PDF performance and layout after deploying this addition.
 
-The [local verification record](pdf_verification.json) records 38 passing tests, including the original 30 saved prediction checks and real local OCR on synthetic PDFs. Cloud PDF/OCR verification remains pending.
+Local verification includes agreement with 30 saved M4 predictions and real OCR on synthetic image-only, mixed and forced-OCR PDFs. The evidence summary is consolidated in the [M5 guide](README.md#consolidated-local-verification); executable regression tests remain in this folder. Cloud PDF/OCR verification remains pending.
 
 Local headless Chrome checks also passed with the saved CPU model: scanned resume plus pasted job, both PDF fields, editable review, replacement-file invalidation, safe damaged-file errors, and Clear. A 390-pixel viewport with dark system preference retained white app/upload backgrounds and no horizontal overflow. These are local checks, not evidence that the deployed app has received this update.

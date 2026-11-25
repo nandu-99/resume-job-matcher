@@ -10,7 +10,7 @@ Use the root `streamlit_app.py` entry point for Community Cloud. Follow the [dep
 
 ## Interface layout
 
-The [interface design notes](UI_DESIGN.md) describe the compact white document workspace, loading states, keyboard focus, and mobile layout. PDF source controls stay in a compact popover; extracted text stays editable and both editors stay aligned. While reading or analysing, controls are disabled and the result area shows the active operation.
+The interface uses aligned document editors, clear loading states and a white background. Input changes clear old results; PDF source controls remain available in a compact popover.
 
 ## PDF inputs
 
@@ -30,7 +30,6 @@ See the [PDF and OCR guide](PDF_INPUT.md) for the workflow, public model choice,
 | [test_inference.py](test_inference.py) | Preparation, checkpoint, CPU prediction, input, and truncation checks |
 | [test_app.py](test_app.py) | Analysis, clearing, stale-result invalidation, truncation display, and unavailable-model UI checks |
 | [test_service.py](test_service.py) | Input boundaries, failure/retry behaviour, response validation, and log-privacy checks |
-| [verification.json](verification.json) | Recorded CPU agreement with saved M4 validation predictions |
 
 ## Setup
 
@@ -181,7 +180,7 @@ RESUME_MATCHER_REVIEW_CSV="/absolute/path/to/error_review_with_text.csv" \
 
 The private CSV contains source text and stays outside the repository. The tests print case identifiers and label differences on failures, rather than document text. Without the CSV, the saved-prediction check is skipped; without model files, CPU integration checks are skipped.
 
-The seven request-service tests check both field limits, invalid inputs without model loading, exact-boundary acceptance, safe failure categories, retry/cache reset, invalid model responses, and successful/failing log privacy. With the configured model, private sample, Tesseract, and test dependencies installed, the current suite runs 38 tests including PDF/OCR checks. The earlier inference-only verification record remains unchanged.
+The seven request-service tests check both field limits, invalid inputs without model loading, exact-boundary acceptance, safe failure categories, retry/cache reset, invalid model responses, and successful/failing log privacy. With the configured model, private sample, Tesseract, and test dependencies installed, the suite includes PDF/OCR checks and a regression for launching PDF extraction outside the repository. Historical inference and PDF verification findings are consolidated below.
 
 The recorded local run uses Python 3.14.0, PyTorch 2.10.0, Transformers 5.3.0, and Tokenizers 0.22.2. These are CPU inference dependencies, separate from the unchanged Colab training environment. Predictions agree with all 30 saved FP16 validation labels on this selected sample. This does not establish complete validation-set equivalence or unchanged logits across hardware and versions. No training or official-test evaluation is repeated for this check.
 
@@ -192,3 +191,21 @@ The Streamlit interface calls `analyse_match()`, which validates the request bef
 Browser checks used local Chrome and the actual saved CPU model, including the synthetic example, long-input notice, editing, and clearing. A 390-pixel viewport with a dark system preference retained white page/input backgrounds, stacked fields, and no horizontal overflow. These checks do not establish hosted response times or production concurrency performance.
 
 The [final evaluation](../m4/evaluation/evaluation_report.md) records low suitable-candidate recall and a higher official-test macro-F1 for the TF-IDF comparator. Retaining the recorded transformer selection here does not establish transformer superiority or deployment readiness. The deployment guide records manual monitoring and recovery steps. The performance report includes hosted measurements; browser acceptance and deployment metadata still require confirmation.
+
+## Code walkthrough for the demonstration
+
+1. [app.py](app.py): collect documents, show loading states and display the result.
+2. [pdf_input.py](pdf_input.py) and [pdf_worker.py](pdf_worker.py): extract embedded text or run bounded local English OCR.
+3. [validation.py](validation.py) and [service.py](service.py): reject invalid requests and handle failures safely.
+4. [inference.py](inference.py): verify the selected weights, apply M3 cleaning, encode resume/JD pairs and predict a label.
+5. [deployment.py](deployment.py): provision the pinned model when local files are absent.
+
+The 50,000-character request bound is not the model context length. DistilBERT processes at most 512 tokens per pair; the interface reports shortened inputs. Validation checks bounds and readable characters, not document relevance.
+
+## Consolidated local verification
+
+Earlier CPU checks verified the selected checkpoint hash and agreement with all 30 saved M4 review predictions using CPU FP32 against recorded FP16 labels. The private fixture SHA-256 was `bcf598d137b5e20c7b6b3a8f63f3ca3410d365a6e335b687c8820baa5cfe2bb4`. The private source-text CSV remains outside Git. This selected sample does not establish full validation equivalence, identical logits, semantic understanding or CUDA equivalence. Training and official-test evaluation were not repeated.
+
+PDF tests cover embedded text, image-only scans, mixed pages, forced OCR, malformed and encrypted files, page/size/text limits, busy workers and worker/OCR failures. Local browser checks covered both PDF inputs, editable review, stale-result clearing and mobile layout. See [PDF_INPUT.md](PDF_INPUT.md) for OCR scope and [performance/README.md](performance/README.md) for separate measured performance. Historical verification snapshots have been consolidated here; executable tests are retained.
+
+Cleanup verification on 26 November 2026: all 39 application tests passed with no skips, including the configured CPU model, 30 saved M4 prediction checks and real synthetic-PDF OCR. Retained M3/M4 notebook code cells, outputs, execution counts and metadata match the backup. M1 and M2 have been restored entirely to their pre-cleanup state; experiment artifacts are unchanged. These are software and artifact-integrity checks, not evidence of improved model accuracy.

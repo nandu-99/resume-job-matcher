@@ -11,6 +11,7 @@ class InputValidationError(ValueError):
 
 
 def validate_inputs(resume_text: str, job_text: str) -> None:
+    # These checks enforce request bounds; they do not assess resume quality or relevance.
     for name, text in (("Resume", resume_text), ("Job description", job_text)):
         if not isinstance(text, str):
             raise TypeError(f"{name} must be a string.")

@@ -27,6 +27,7 @@ RESULT_COPY = {
 }
 
 
+# Editing either document invalidates the previous prediction.
 def clear_result():
     st.session_state["match_result"] = None
     st.session_state["match_error"] = None
@@ -159,6 +160,7 @@ def document_panel(prefix, title, number, busy):
     return st.session_state[f"{prefix}_text"]
 
 
+# Render the busy state first, then extract a PDF or call the matching service.
 def run_pending_action():
     pending = st.session_state["pending_action"]
     if not pending:
@@ -198,6 +200,7 @@ def run_pending_action():
     st.rerun()
 
 
+# Show the predicted class and coverage notice; no calibrated match percentage is available.
 def result_panel():
     with st.container(border=True, key="result_panel"):
         content = st.empty()

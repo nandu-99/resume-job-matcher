@@ -6,19 +6,17 @@ The transformer experiments use a shared data-preparation workflow before tokeni
 
 | File | Purpose |
 |---|---|
-| [Model-development notebook](notebooks/m3-model-development.ipynb) | Uploaded Colab notebook with its executed cells and saved outputs unchanged |
+| [Model-development notebook](notebooks/m3-model-development.ipynb) | Job-grouped data setup with explanatory Markdown; original executable cells and outputs preserved |
 | [Split manifest](splits/split_manifest.json) | Dataset revision, source row identifiers, splitter settings, labels, and environment versions |
 | [Split counts](splits/split_counts.csv) | Rows and class counts for each split |
 | [Split overlap](splits/split_overlap.csv) | Shared jobs, resumes, and pairs between splits |
-| [Transformer-input notebook](notebooks/m3-transformer-models.ipynb) | Uploaded notebook with executed preparation, tokenization, and batch checks unchanged |
 | [Tokenization configuration](tokenization/tokenization_config.json) | Model revisions, label mapping, input policy, and package versions |
 | [Input lengths](tokenization/input_lengths.csv) | Untruncated training and validation token statistics |
 | [Tokenization report](tokenization/tokenization_report.csv) | Tokenized row counts, lengths, and training/validation retention |
 | [Batch report](tokenization/batch_report.csv) | Dynamic-padding checks and label tensor types |
-| [MiniLM fine-tuning notebook](notebooks/m3-minilm-finetuning.ipynb) | Uploaded training notebook and saved outputs unchanged |
 | [Experiment log](experiment-log.csv) | Comparable run summaries using the shared M3 split protocol |
 | [MiniLM experiment evidence](experiments/minilm-v1/) | Training history, selected-checkpoint validation reports, run settings, and reload checks |
-| [DistilBERT fine-tuning notebook](notebooks/m3-distilbert-finetuning.ipynb) | Uploaded Colab notebook with training, export checks, and comparison outputs unchanged |
+| [Combined MiniLM and DistilBERT notebook](notebooks/m3-distilbert-finetuning.ipynb) | Both training runs, export checks and comparison; explanatory Markdown with original code and outputs |
 | [DistilBERT experiment evidence](experiments/distilbert-v1/) | Training history, validation reports, run settings, and reload checks |
 | [Model comparison](comparison/comparison_notes.md) | Findings with the numeric comparison and figure |
 
@@ -64,11 +62,11 @@ Keep the same dataset revision, preparation functions, source row identifiers, a
 
 Rebuild the prepared pool, select rows by their saved identifiers in the recorded order, and verify the split counts and overlap. Use validation to select settings and leave official test labels out of training and model selection. The recorded notebook verifies that saved identifiers reconstruct every split exactly.
 
-The transformer-input notebook reconstructs these exact source rows and prepares both models' inputs. The MiniLM fine-tuning experiment described below uses these datasets and collators. The input-preparation notebook remains a separate, unchanged reference.
+The combined training notebook reconstructs these source rows, prepares both tokenizers, trains MiniLM and then DistilBERT, and compares validation results. Duplicate tokenization and MiniLM-only snapshots have been removed after checking that all their nonempty source cells and outputs are included.
 
 ## Transformer input preparation
 
-The [transformer notebook](notebooks/m3-transformer-models.ipynb) starts in a fresh Colab GPU runtime. It uses the recorded dataset revision and the existing split manifest rather than generating another split. It checks the class counts, unique jobs, shared resumes, and zero job/pair overlap against the saved reports before tokenization.
+The [transformer notebook](notebooks/m3-distilbert-finetuning.ipynb) starts in a fresh Colab GPU runtime. It uses the recorded dataset revision and the existing split manifest rather than generating another split. It checks the class counts, unique jobs, shared resumes, and zero job/pair overlap against the saved reports before tokenization.
 
 The split manifest included in the uploaded tokenization archive matches [splits/split_manifest.json](splits/split_manifest.json). The repository keeps that single canonical copy. The four tokenization files are copied unchanged from the archive; neither the ZIP nor a second split manifest is added.
 
@@ -108,11 +106,11 @@ Tokenized datasets retain 5,081 training rows, 1,147 validation rows, and 1,759 
 5. Inspect the length, retention, and batch reports. The notebook downloads `m3_tokenization_setup.zip` after checking that the exported settings and reports round-trip correctly.
 6. Save the notebook and archive. Keep the runtime connected when continuing into fine-tuning, since `tokenized_datasets` and `collators` are in memory.
 
-Tokenization and collation settings are stored in the configuration; complete package versions are also recorded there. Tokenized sequences and resume/job text are not exported in these repository artifacts. The original M1/M2 notebooks and the data-setup notebook remain unchanged.
+Tokenization and collation settings are stored in the configuration; complete package versions are also recorded there. Tokenized sequences and resume/job text are not exported in these repository artifacts. The original baseline notebook remains unchanged. The preparation and retained training notebooks have explanatory Markdown, with executable cells and outputs preserved.
 
 ## MiniLM fine-tuning
 
-The [training notebook](notebooks/m3-minilm-finetuning.ipynb) fine-tunes all 33,361,155 parameters of `microsoft/MiniLM-L12-H384-uncased`, including a newly initialised three-class head. It builds on the shared split and input policy without changing either earlier notebook. Its code and saved outputs are copied unchanged from the uploaded Colab notebook.
+The [training notebook](notebooks/m3-distilbert-finetuning.ipynb) fine-tunes all 33,361,155 parameters of `microsoft/MiniLM-L12-H384-uncased`, including a newly initialised three-class head. It builds on the shared split and input policy using the same preparation workflow. The combined notebook contains MiniLM and DistilBERT training; only explanatory Markdown has been added to its original code and saved outputs.
 
 ### Training setup
 
@@ -162,7 +160,7 @@ The [experiment log](experiment-log.csv) records both transformer runs. Any targ
 
 ## DistilBERT fine-tuning and comparison
 
-The [DistilBERT notebook](notebooks/m3-distilbert-finetuning.ipynb) contains the shared preparation workflow, the MiniLM reference run, DistilBERT training, export verification, and the model comparison. It is copied unchanged from the uploaded Colab notebook. The earlier notebooks remain separate references.
+The [DistilBERT notebook](notebooks/m3-distilbert-finetuning.ipynb) contains the shared preparation workflow, the MiniLM reference run, DistilBERT training, export verification, and the model comparison. Its original executable cells and saved outputs are preserved, with Markdown sections added for navigation. Earlier tokenization and MiniLM-only copies have been consolidated into this notebook.
 
 DistilBERT uses revision `12040accade4e8a0f71eabdb258fecc2e7e948be` and fine-tunes all 66,955,779 parameters. Its [training arguments](experiments/distilbert-v1/training_arguments.json) match MiniLM's except for the output directory, including three maximum epochs, seed 42, unweighted cross-entropy, effective batch size 16, learning rate 0.00002, FP16, and validation macro-F1 selection. Both use early-stopping patience one. MiniLM and its optimizer tensors were moved to CPU before measuring DistilBERT GPU use.
 

@@ -14,33 +14,43 @@ We then examined the dataset for class imbalance, inconsistent labels, duplicate
 
 The [related-work overview](m1/related-work.md) connects the paper reviews to these choices.
 
-## Project files
+## Presentation and code walkthrough
 
-- [Related work](m1/related-work.md): five paper reviews, comparison, and design rationale.
-- [Problem brief](m1/problem-brief.md): users, workflow, business objective, and success measures.
-- [Feasibility analysis](m1/feasibility-analysis.md): data, tools, cost, and project risks.
-- [Project presentation](m2/presentation.pdf): 10 slides covering the problem, data, methods, and findings.
-- [Data preparation guide](m2/README.md): dataset reports, preparation steps, and notebook instructions.
-- [Baseline models](m2/notebooks/m2-baseline-reproduction.ipynb): TF-IDF cosine similarity and paired TF-IDF with SGD, with the original saved results.
-- [Transformer data setup](m3/README.md): the Colab notebook, shared job-grouped splits, and reproduction instructions for model development.
-- [Transformer inputs](m3/notebooks/m3-transformer-models.ipynb): the executed MiniLM and DistilBERT tokenization workflow, truncation reports, and batch checks.
-- [MiniLM fine-tuning](m3/notebooks/m3-minilm-finetuning.ipynb): the executed training workflow and validation evidence, summarised in the [experiment log](m3/experiment-log.csv).
+Open these files in order when explaining the project. M3 and M4 notebook section headings explain each stage; M1 and M2 remain as they were before cleanup. Executable code and saved outputs are preserved.
 
-- [DistilBERT fine-tuning](m3/notebooks/m3-distilbert-finetuning.ipynb): the executed training workflow and selected-checkpoint validation reports.
-- [Transformer comparison](m3/comparison/comparison_notes.md): shared-protocol results and class-level trade-offs.
-- [Evaluation and optimization](m4/README.md): shared-split reference evaluation, a section-aware input experiment, saved predictions, and model comparisons.
-- [Section-aware input comparison](m4/comparison/section-aware-v1/comparison_notes.md): the input-policy experiment, class-level results, and the decision to retain the original DistilBERT policy.
-- [Class-weighted training comparison](m4/comparison/class-weighted-v1/comparison_notes.md): training-only class weights, recorded validation gains, and class-recall trade-offs.
-- [Final evaluation](m4/evaluation/evaluation_report.md): reviewed validation errors, robustness tests, GPU inference measurements, frozen selection, and official-test results.
-- [Final evaluation notebook](m4/notebooks/m4-final-evaluation.ipynb): the unchanged executed Colab continuation and saved outputs.
-- [Model inference](m5/README.md): the reusable CPU prediction function, selected-checkpoint loading, truncation details, and verification against saved validation examples.
-- [PDF upload and OCR](m5/PDF_INPUT.md): text extraction and English neural OCR for resume and job PDFs, with editable review and bounded processing.
-- [Streamlit deployment](m5/DEPLOYMENT.md): model hosting, secrets, publishing steps, hosted verification, and CPU performance measurements.
-- [Streamlit interface](m5/app.py): white-theme resume and job inputs, bounded requests, model predictions, input-coverage notices, and safe failure messages. See the [M5 guide](m5/README.md) for setup, logging, and recovery behaviour.
+| Stage | Open this file | What to show |
+|---|---|---|
+| M1: problem and feasibility | [Problem brief](m1/problem-brief.md) and [feasibility](m1/feasibility-analysis.md) | Users, business objective, success targets and practical limits |
+| M1: existing work | [Related work](m1/related-work.md) | Five paper reviews, source links and model-selection rationale |
+| M2: data preparation | [Preparation notebook](m2/notebooks/m2-data-preparation.ipynb) | Quality checks, duplicate handling, cleaning and historical splits |
+| M2: original baseline | [Baseline notebook](m2/notebooks/m2-baseline-reproduction.ipynb) | TF-IDF cosine similarity and SGD; original notebook preserved unchanged |
+| M3: shared splits | [Data setup notebook](m3/notebooks/m3-model-development.ipynb) | Job-grouped validation and reproducible source-row selection |
+| M3: transformer training | [Combined training notebook](m3/notebooks/m3-distilbert-finetuning.ipynb) | Input tokenization, MiniLM and DistilBERT training, checkpoint selection and comparison |
+| M4: experiments and evaluation | [Combined evaluation notebook](m4/notebooks/m4-final-evaluation.ipynb) | TF-IDF reference, section-aware inputs, weighted loss, errors, robustness and final test |
+| M4: findings | [Evaluation report](m4/evaluation/evaluation_report.md) | Measured results, frozen model selection and limitations |
+| M5: user interface | [app.py](m5/app.py) | Input modes, editable text, loading states and result display |
+| M5: PDF and OCR | [pdf_input.py](m5/pdf_input.py) and [pdf_worker.py](m5/pdf_worker.py) | Bounded extraction and local English OCR fallback |
+| M5: model prediction | [inference.py](m5/inference.py) | Selected-weight verification, cleaning, 512-token encoding and classifier prediction |
+| M5: request handling | [service.py](m5/service.py) and [validation.py](m5/validation.py) | Input bounds, metadata-only logging and safe failures |
+| M6: technical report | [IEEE report PDF](m6/ieee-report.pdf) and [LaTeX source](m6/ieee-report.tex) | Methods, results, error analysis, system design, deployment and limitations |
 
-The preparation notebook provides the data workflow and additional cleaned-pair checks. The baseline notebook retains the existing model implementation so candidate approaches can build on it. Its saved test macro-F1 values are 0.3708 for cosine similarity and 0.4100 for paired TF-IDF with SGD.
+The filename `m3-distilbert-finetuning.ipynb` is retained for continuity; it contains both MiniLM and DistilBERT. M4 similarly has one combined notebook rather than duplicate snapshots of its earlier stages. Notebooks that need Colab uploads document their inputs in the opening sections. Full GPU workflows are for reproduction; use their saved outputs during the presentation.
 
-[requirements.txt](m2/requirements.txt) preserves the original baseline dependencies. The preparation notebook records newer versions in its setup cell and saved environment output; it has not been validated against the original baseline dependencies. The original baseline notebook and five paper summaries are kept exactly as committed.
+Supporting guides: [M2](m2/README.md), [M3](m3/README.md), [M4](m4/README.md), [M5](m5/README.md), [PDF/OCR](m5/PDF_INPUT.md), [deployment](m5/DEPLOYMENT.md) and [performance](m5/performance/README.md). Configurations, histories, prediction tables and checks remain in the corresponding milestone folders.
+
+[Original presentation](m2/presentation.pdf) retains the earlier ten-slide content and design. It is not a substitute for the final delivery presentation. [Baseline results](m2/reproduction-results.md) and [reproduction observations](m2/reproduction-observations.md) remain separate original documents. [M2 requirements](m2/requirements.txt) preserve the baseline environment; training and CPU deployment use their separately documented environments.
+
+## Run the prototype locally
+
+From the repository root, install the runtime dependencies in a virtual environment and point the application to the selected model files:
+
+```bash
+python -m pip install -r m5/requirements.txt
+export RESUME_MATCHER_MODEL_DIR="/absolute/path/to/distilbert_weighted_v1"
+python -m streamlit run streamlit_app.py
+```
+
+For scanned PDFs, install Tesseract as described in the [PDF guide](m5/PDF_INPUT.md). For hosted model downloads and secrets, follow [deployment setup](m5/DEPLOYMENT.md). The model files stay outside Git; inference verifies them against [the frozen M4 selection](m4/evaluation/model_selection.json).
 
 ## Data handling
 

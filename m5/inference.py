@@ -71,6 +71,7 @@ class ResumeJobMatcher:
                 "Extract distilbert_weighted_v1_model.zip into that folder."
             )
 
+        # Verify the input policy and weight hash against the model selected in M4.
         selection = json.loads(SELECTION_PATH.read_text(encoding="utf-8"))
         policy = selection["input_policy"]
         if (
@@ -131,6 +132,7 @@ class ResumeJobMatcher:
                     verbose=False,
                 )["input_ids"])
 
+            # Preserve training-time pair order; shorten the longer document to fit 512 tokens.
             inputs = self.tokenizer(
                 resume, job,
                 add_special_tokens=True,
@@ -145,6 +147,7 @@ class ResumeJobMatcher:
                 torch.autocast("cuda", dtype=torch.float16)
                 if self.device.type == "cuda" else nullcontext()
             )
+            # Predict one of the three trained labels without updating model weights.
             with torch.inference_mode(), precision:
                 label_id = int(self.model(**inputs).logits.argmax(dim=-1).item())
 

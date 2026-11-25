@@ -6,25 +6,22 @@ Evaluation uses the shared M3 job-grouped splits for the TF-IDF reference, secti
 
 | File | Purpose |
 |---|---|
-| [Reference evaluation notebook](notebooks/m4-reference-evaluation.ipynb) | Uploaded Colab notebook, including executed cells and outputs, unchanged |
 | [Reference experiment reports](experiments/tfidf-sgd-v1/) | Configuration, metrics, class report, confusion matrix, validation predictions, preparation checks, and reload verification |
 | [Experiment log](experiment-log.csv) | Reference, section-aware, and class-weighted run summaries, measured results, and timings |
 | [Comparison notes](comparison/comparison_notes.md) | Findings, approach differences, and limitations |
 | [Comparison CSV](comparison/reference_model_comparison.csv) | Exact validation scores for all three approaches |
 | [Comparison figure](comparison/reference_model_comparison.png) | Macro-F1 and class recall comparison |
-| [Section-aware notebook](notebooks/m4-section-aware-inputs.ipynb) | Uploaded Colab continuation with section preparation, training, and saved checks unchanged |
 | [Section-aware experiment reports](experiments/distilbert-section-v1/) | Input policy, training settings, section audits, selected-checkpoint validation reports, and reload checks |
 | [Input-policy comparison](comparison/section-aware-v1/comparison_notes.md) | Original versus section-aware DistilBERT results, decision, CSV, and figure |
-| [Class-weighted notebook](notebooks/m4-class-weighted-distilbert.ipynb) | Uploaded continuation with original-input reconstruction, weighted training, and export checks unchanged |
 | [Class-weighted experiment reports](experiments/distilbert-weighted-v1/) | Class weights, run settings, input audit, history, validation evidence, and reload check |
 | [Loss comparison](comparison/class-weighted-v1/comparison_notes.md) | Original versus weighted loss results, trade-offs, CSV, and figure |
-| [Final evaluation notebook](notebooks/m4-final-evaluation.ipynb) | Uploaded executed continuation unchanged |
+| [Final evaluation notebook](notebooks/m4-final-evaluation.ipynb) | Combined workflow with explanatory Markdown; original code and outputs preserved |
 | [Evaluation report](evaluation/evaluation_report.md) | Shared-protocol results, error review, robustness, inference, and limitations |
 | [Frozen selection](evaluation/model_selection.json) | Pre-test decision, input policy, checkpoint hash, and fixed comparators |
 | [Official-test results](evaluation/official_test_metrics.csv) | Selected model and comparator scores on the unchanged official test |
 | [Artifact manifest](evaluation/artifact_manifest.json) | Original archive checksums for final evaluation evidence |
 
-The reference notebook and all 12 files from its uploaded reports archive are preserved unchanged. The section-aware notebook and all 17 files from its reports archive are also preserved unchanged. The class-weighted notebook and all 14 files from its reports archive are preserved unchanged. The final evaluation notebook and all 27 files from its reports archive are also preserved unchanged. The report folders contain source row identifiers, labels, predictions, and paraphrased evidence notes rather than full resume or job records. Trained model files and downloaded ZIPs stay outside Git.
+The combined notebook preserves the original reference, section-aware, weighted and final-evaluation code and saved outputs. Earlier notebook snapshots had identical source cells and outputs for those stages and have been removed. All experiment reports and the 27 final evaluation artifacts, including their original checksum manifest, remain unchanged. Reports contain source row identifiers, labels, predictions and paraphrased evidence notes rather than full documents. Model weights and downloaded ZIPs stay outside Git.
 
 ## Shared evaluation protocol
 
@@ -72,7 +69,7 @@ The input-policy and class-weighted experiments below use validation data for co
 
 ## Section-aware input experiment
 
-The [section-aware notebook](notebooks/m4-section-aware-inputs.ipynb) continues the reference notebook, so it includes the earlier CPU reference work before the transformer cells. The uploaded code and outputs are unchanged. The existing reference notebook remains a separate reference.
+The [combined notebook](notebooks/m4-final-evaluation.ipynb) includes the reference evaluation followed by section-aware training. Explanatory Markdown separates the stages; original executable cells and saved outputs are preserved.
 
 The experiment starts from the same pretrained DistilBERT revision, `12040accade4e8a0f71eabdb258fecc2e7e948be`, rather than continuing a fine-tuned model. Training arguments match the original DistilBERT run except for the output directory. Both use seed 42, unweighted cross-entropy, effective batch size 16, learning rate 0.00002, FP16, a three-epoch limit, validation macro-F1 selection, and early-stopping patience one. This keeps class weighting out of the input-policy comparison.
 
@@ -113,7 +110,7 @@ The [reload check](experiments/distilbert-section-v1/reload_check.json) confirms
 
 ## Class-weighted DistilBERT experiment
 
-The [class-weighted notebook](notebooks/m4-class-weighted-distilbert.ipynb) continues the earlier notebook and retains the reference and section-aware work before adding weighted training. It is copied unchanged from the uploaded Colab notebook. Earlier notebooks, reports, and comparisons remain unchanged.
+The [combined notebook](notebooks/m4-final-evaluation.ipynb) continues with class-weighted training and final evaluation. Duplicate notebook snapshots have been removed; their original code and saved outputs are present in this notebook.
 
 ### Inputs, weights, and training
 
@@ -156,7 +153,7 @@ The [reload check](experiments/distilbert-weighted-v1/reload_check.json) records
 
 ## Final evaluation and model selection
 
-The [final notebook](notebooks/m4-final-evaluation.ipynb) continues the earlier reference, section-aware, and weighted work before adding assessment. Its code and saved outputs are copied unchanged from the uploaded notebook. The [evaluation directory](evaluation/) contains the exact 27 files from the Colab reports archive, including the original checksum manifest. No original paper summary, presentation, or earlier notebook is modified.
+The [final notebook](notebooks/m4-final-evaluation.ipynb) continues the earlier reference, section-aware, and weighted work before adding assessment. Its executable code and saved outputs are preserved; added Markdown identifies each experiment and its interpretation. The [evaluation directory](evaluation/) contains the exact 27 files from the Colab reports archive, including the original checksum manifest. Original paper summaries and the presentation are unchanged; duplicate notebook snapshots have been consolidated.
 
 ### Selection and official-test results
 

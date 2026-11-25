@@ -57,6 +57,7 @@ def analyse_match(resume_text: str, job_text: str) -> dict:
     resume_chars = len(resume_text) if isinstance(resume_text, str) else None
     job_chars = len(job_text) if isinstance(job_text, str) else None
 
+    # Log timing and counts only, keeping document text and raw exceptions out of logs.
     def record(event, *, truncated=None):
         metadata = {
             "event": event,
@@ -69,6 +70,7 @@ def analyse_match(resume_text: str, job_text: str) -> dict:
             metadata["truncated"] = truncated
         LOGGER.info(json.dumps(metadata, sort_keys=True))
 
+    # Reject invalid requests before spending time loading the model.
     try:
         prepare_inputs(resume_text, job_text)
     except (TypeError, InputValidationError) as error:

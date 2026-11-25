@@ -22,6 +22,7 @@ def provision_model(directory: str | Path) -> None:
         return  # Local-only setup retains the existing missing-files error.
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Set a full 40-character model repository commit revision.")
+    # Pin the model to an immutable revision and download only inference files.
     snapshot_download(
         repo_id=repo, revision=revision,
         token=os.environ.get("HF_TOKEN") or False,

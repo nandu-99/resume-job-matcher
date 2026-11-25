@@ -36,6 +36,7 @@ def read_ocr(page, remaining):
     width, height = page.get_size()
     if not all(math.isfinite(value) and value > 0 for value in (width, height)):
         raise PDFInputError("A PDF page has an invalid size. Export the document again.")
+    # Bound image dimensions before OCR to limit per-page memory and processing cost.
     scale = min(2.5, MAX_RENDER_EDGE / max(width, height))
     with closing(page.render(scale=scale)) as bitmap:
         with bitmap.to_pil().convert("RGB") as image:
@@ -78,6 +79,7 @@ def read_document(content, *, force_ocr=False):
                     if textpage.count_chars() > MAX_INPUT_CHARACTERS:
                         raise PDFInputError("The PDF contains too much text. Use at most 50,000 characters.")
                     text = clean_text(textpage.get_text_bounded())
+                # Prefer embedded text; use English OCR for scans or explicit user requests.
                 if force_ocr or needs_ocr(text):
                     text = read_ocr(page, remaining)
                     ocr_pages.append(index + 1)

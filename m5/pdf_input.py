@@ -44,6 +44,7 @@ def _extract_pdf(content: bytes, *, force_ocr: bool = False) -> ExtractedPDF:
         raise PDFInputError("The PDF is too large. Upload a file no larger than 10 MB.")
     if not content[:1024].lstrip().startswith(b"%PDF-"):
         raise PDFInputError("This file is not a readable PDF. Export it as PDF and try again.")
+    # Run native PDF parsing separately, with a deadline and a stable module launch path.
     command = [sys.executable, "-m", "m5.pdf_worker"]
     if force_ocr:
         command.append("--force-ocr")
