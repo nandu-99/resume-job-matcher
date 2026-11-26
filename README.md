@@ -1,79 +1,119 @@
 # Resume-Job Matching System
 
-NLP · Industry Track
+A Streamlit application that compares an English resume with a job description and predicts **Good Fit**, **Potential Fit**, or **No Fit**. It supports pasted text, PDF uploads, and English OCR for scanned documents.
 
-We are building a recruiter support tool that compares a resume with a job description and predicts **Good Fit**, **Potential Fit**, or **No Fit**. A recruiter reviews the result and makes the final decision.
+The application uses a fine-tuned, class-weighted DistilBERT checkpoint. The repository includes the data preparation, baseline methods, transformer training, experiments, and evaluation behind the prototype. Predictions support human review and do not make hiring decisions.
 
-Our evaluation focuses on an existing candidate pool matched with new job descriptions. It does not establish performance on completely new applicants.
+[Live application](https://resume-job-matcher-nlp.streamlit.app/) · [Technical report](m6/ieee-report.pdf) · [Presentation PDF](m6/presentation.pdf)
 
-## Approach
+## Features
 
-We began by reviewing five papers to understand existing resume-job matching methods, their results, and their practical limits. The comparison covered shared text representations, sentence embeddings, contrastive learning, and accessible lexical baselines. Data access, task fit, and CPU requirements led us to a public three-class dataset and TF-IDF reference methods.
+- Independent text or PDF input for the resume and job description.
+- Embedded PDF text extraction with local English OCR for scanned pages.
+- Editable extracted text before analysis.
+- Three-class predictions with input coverage and truncation warnings.
+- Loading states, input limits, safe error messages, and stale-result clearing.
+- CPU inference with checkpoint verification and reusable model loading.
+- Repeatable dataset splits, saved experiment settings, and evaluation artifacts.
 
-We then examined the dataset for class imbalance, inconsistent labels, duplicate pairs, document lengths, and overlap between splits. The preparation pipeline turns those findings into repeatable cleaning and split decisions. Model comparison and evaluation build on this foundation, with human review at the centre of the recruiter workflow.
+## How it works
 
-The [related-work overview](m1/related-work.md) connects the paper reviews to these choices.
+1. **Provide documents:** paste text or upload a PDF for each input.
+2. **Extract and review:** read embedded text with `pypdfium2`; use Tesseract OCR for scanned pages. Review and correct the extracted text.
+3. **Prepare inputs:** validate size and format, normalise text, and replace contact details with placeholders.
+4. **Run inference:** tokenize the resume and job together and pass them to the saved DistilBERT classifier. The highest-scoring class becomes the prediction.
+5. **Display the result:** show the fit label and whether the model shortened the input.
 
-## Presentation and code walkthrough
+The combined model input is limited to **512 tokens**, including special tokens. PDF extraction can read more text than the classifier can process. The interface reports this distinction rather than silently implying full coverage. The matching pipeline does not call an external assessment API.
 
-Open these files in order when explaining the project. M3 and M4 notebook section headings explain each stage; M1 and M2 remain as they were before cleanup. Executable code and saved outputs are preserved.
+## Run locally
 
-| Stage | Open this file | What to show |
-|---|---|---|
-| M1: problem and feasibility | [Problem brief](m1/problem-brief.md) and [feasibility](m1/feasibility-analysis.md) | Users, business objective, success targets and practical limits |
-| M1: existing work | [Related work](m1/related-work.md) | Five paper reviews, source links and model-selection rationale |
-| M2: data preparation | [Preparation notebook](m2/notebooks/m2-data-preparation.ipynb) | Quality checks, duplicate handling, cleaning and historical splits |
-| M2: original baseline | [Baseline notebook](m2/notebooks/m2-baseline-reproduction.ipynb) | TF-IDF cosine similarity and SGD; original notebook preserved unchanged |
-| M3: shared splits | [Data setup notebook](m3/notebooks/m3-model-development.ipynb) | Job-grouped validation and reproducible source-row selection |
-| M3: transformer training | [Combined training notebook](m3/notebooks/m3-distilbert-finetuning.ipynb) | Input tokenization, MiniLM and DistilBERT training, checkpoint selection and comparison |
-| M4: experiments and evaluation | [Combined evaluation notebook](m4/notebooks/m4-final-evaluation.ipynb) | TF-IDF reference, section-aware inputs, weighted loss, errors, robustness and final test |
-| M4: findings | [Evaluation report](m4/evaluation/evaluation_report.md) | Measured results, frozen model selection and limitations |
-| M5: user interface | [app.py](m5/app.py) | Input modes, editable text, loading states and result display |
-| M5: PDF and OCR | [pdf_input.py](m5/pdf_input.py) and [pdf_worker.py](m5/pdf_worker.py) | Bounded extraction and local English OCR fallback |
-| M5: model prediction | [inference.py](m5/inference.py) | Selected-weight verification, cleaning, 512-token encoding and classifier prediction |
-| M5: request handling | [service.py](m5/service.py) and [validation.py](m5/validation.py) | Input bounds, metadata-only logging and safe failures |
-| M6: technical report | [IEEE report PDF](m6/ieee-report.pdf) and [LaTeX source](m6/ieee-report.tex) | Methods, results, error analysis, system design, deployment and limitations |
-
-The filename `m3-distilbert-finetuning.ipynb` is retained for continuity; it contains both MiniLM and DistilBERT. M4 similarly has one combined notebook rather than duplicate snapshots of its earlier stages. Notebooks that need Colab uploads document their inputs in the opening sections. Full GPU workflows are for reproduction; use their saved outputs during the presentation.
-
-Supporting guides: [M2](m2/README.md), [M3](m3/README.md), [M4](m4/README.md), [M5](m5/README.md), [PDF/OCR](m5/PDF_INPUT.md), [deployment](m5/DEPLOYMENT.md) and [performance](m5/performance/README.md). Configurations, histories, prediction tables and checks remain in the corresponding milestone folders.
-
-[Original presentation](m2/presentation.pdf) retains the earlier ten-slide content and design. It is not a substitute for the final delivery presentation. [Baseline results](m2/reproduction-results.md) and [reproduction observations](m2/reproduction-observations.md) remain separate original documents. [M2 requirements](m2/requirements.txt) preserve the baseline environment; training and CPU deployment use their separately documented environments.
-
-## Run the prototype locally
-
-From the repository root, install the runtime dependencies in a virtual environment and point the application to the selected model files:
+Use Python 3.11 or later. From the repository root:
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 python -m pip install -r m5/requirements.txt
+```
+
+Extract the team's selected `distilbert_weighted_v1_model.zip` archive into a local directory containing:
+
+```text
+distilbert_weighted_v1/
+  config.json
+  model.safetensors
+  tokenizer.json
+  tokenizer_config.json
+  weighted_run_config.json
+```
+
+Point the application to that directory and start Streamlit:
+
+```bash
 export RESUME_MATCHER_MODEL_DIR="/absolute/path/to/distilbert_weighted_v1"
 python -m streamlit run streamlit_app.py
 ```
 
-For scanned PDFs, install Tesseract as described in the [PDF guide](m5/PDF_INPUT.md). For hosted model downloads and secrets, follow [deployment setup](m5/DEPLOYMENT.md). The model files stay outside Git; inference verifies them against [the frozen M4 selection](m4/evaluation/model_selection.json).
+Open the address printed by Streamlit, normally `http://localhost:8501`.
 
-## Data handling
+Model weights are excluded from Git. Loading verifies them against the [recorded model selection](m4/evaluation/model_selection.json). For scanned PDFs, install Tesseract using the [PDF/OCR guide](m5/PDF_INPUT.md). Private Hugging Face model provisioning and Streamlit Community Cloud configuration are covered in the [deployment guide](m5/DEPLOYMENT.md).
 
-Download the dataset through the notebook. Do not commit raw or cleaned resume records, local dataset caches, or personal data. The dataset's licence and collection details have not been established by this project; public access alone does not establish permission for reuse or redistribution.
+## Data and training
 
-## Shared-protocol reference evaluation
+The project uses the public Hugging Face dataset [`cnamuangtoun/resume-job-description-fit`](https://huggingface.co/datasets/cnamuangtoun/resume-job-description-fit), with 8,000 labelled resume-job pairs. A [review of five papers](m1/related-work.md) informed the dataset and baseline choices.
 
-Paired TF-IDF with SGD achieves validation macro-F1 0.2923 on the M3 splits, compared with MiniLM at 0.3081 and DistilBERT at 0.3540. TF-IDF retains the highest Potential Fit recall, while MiniLM has the highest Good Fit recall. All three approaches miss many suitable candidates. The [comparison notes](m4/comparison/comparison_notes.md) explain preprocessing differences and limitations. These validation results preceded the separately recorded final selection and official-test evaluation.
+Preparation removes conflicting-label pairs and extra duplicate copies from the original training pool. The shared experiment splits contain 5,081 training, 1,147 validation, and 1,759 official-test pairs. No jobs or prepared pairs overlap across these splits, although some resumes are shared. This evaluates new jobs against a largely known candidate pool, rather than entirely new applicants.
 
-The section-aware DistilBERT experiment achieves validation macro-F1 0.3258, below the original 0.3540. Potential Fit recall increases, while Good Fit recall falls to 0.0500. The original input policy remains the stronger candidate. The [M4 guide](m4/README.md) records this improvement attempt, its configuration, and its limitations.
+The experiments include TF-IDF cosine similarity, paired TF-IDF with SGD, MiniLM, and DistilBERT. Transformer runs use validation macro-F1 for checkpoint selection. Later experiments test section-aware input preparation and class-weighted loss. Training environments and model revisions are recorded separately from the CPU application dependencies.
 
-Class-weighted DistilBERT with the original input policy reaches validation macro-F1 0.3582, compared with 0.3540 for the unweighted run. The small gain comes with lower Good Fit recall and accuracy. It was selected before official-test inference using validation macro-F1; the final results below retain that recorded selection.
+## Results
 
-## Final evaluation
+Class-weighted DistilBERT was selected using validation macro-F1 before official-test evaluation. Original DistilBERT and TF-IDF + SGD were fixed comparators; no model reselection or threshold tuning followed the test.
 
-The class-weighted DistilBERT checkpoint was selected using validation macro-F1 before the official test was evaluated. Original DistilBERT and TF-IDF were fixed comparators. Test results were reported without model reselection or threshold tuning.
+| Model | Validation macro-F1 | Official-test macro-F1 |
+|---|---:|---:|
+| Class-weighted DistilBERT | 0.3582 | 0.3563 |
+| Original DistilBERT | 0.3540 | 0.3626 |
+| TF-IDF + SGD | 0.2923 | 0.4058 |
 
-| Model | Evaluation role | Validation macro-F1 | Official-test macro-F1 |
-|---|---|---:|---:|
-| Class-weighted DistilBERT | Selected before test | 0.3582 | 0.3563 |
-| Original DistilBERT | Fixed comparator | 0.3540 | 0.3626 |
-| TF-IDF + SGD | Fixed comparator | 0.2923 | 0.4058 |
+**TF-IDF + SGD achieved the highest test macro-F1.** The weighted model's small validation gain did not carry over to the test. MiniLM and section-aware DistilBERT reached validation macro-F1 of 0.3081 and 0.3258 respectively and were not included in the final official-test comparison.
 
-TF-IDF has the highest test macro-F1 among these fixed comparisons. The weighted run's small validation gain does not carry over to the test set, and transformer superiority is not established. The recorded selection remains unchanged; it does not establish a deployment recommendation.
+The [evaluation report](m4/evaluation/evaluation_report.md) includes per-class results, confusion matrices, 30 qualitatively reviewed validation cases, and robustness tests on 300 balanced validation pairs. Earlier M2 results use a different split protocol and are documented separately.
 
-The [evaluation report](m4/evaluation/evaluation_report.md) documents 30 qualitatively reviewed validation cases, robustness tests on 300 balanced validation pairs, and model-only GPU inference measurements. Suitable-candidate recall remains low, so further use is limited to a prototype with human review. Earlier historical M2 test scores use a different split protocol.
+## Repository structure
+
+| Directory | Contents |
+|---|---|
+| [m1/](m1/) | Problem definition, feasibility, related work, and paper reviews |
+| [m2/](m2/README.md) | Original data preparation, baseline notebooks, and reproduction results |
+| [m3/](m3/README.md) | Shared splits, tokenization, MiniLM and DistilBERT training, and experiment artifacts |
+| [m4/](m4/README.md) | Improvement experiments, error analysis, robustness tests, and final evaluation |
+| [m5/](m5/README.md) | Streamlit application, PDF/OCR processing, inference, validation, tests, and deployment |
+| [m6/](m6/) | IEEE report and LaTeX source, HTML/PDF presentation, and project documentation |
+
+The [MiniLM and DistilBERT notebook](m3/notebooks/m3-distilbert-finetuning.ipynb) contains both transformer runs. The [combined evaluation notebook](m4/notebooks/m4-final-evaluation.ipynb) contains the later reference evaluation, improvement experiments, and final assessment.
+
+## Tests
+
+```bash
+python -m unittest discover -s m5 -v
+```
+
+The suite covers inference, input validation, service failures, UI behaviour, model provisioning, and PDF/OCR handling. Model-dependent checks require the selected model files; OCR checks require Tesseract. The optional private review fixture is documented in the [application guide](m5/README.md). Software tests verify implementation behaviour and do not measure matching quality.
+
+## Limitations and data handling
+
+- Long pairs are truncated to 512 combined tokens, which can remove relevant information.
+- Suitable-candidate recall remains low, and the original quality targets were not met. The model can return incorrect labels, including for irrelevant inputs that pass format checks.
+- Predictions are not calibrated suitability percentages or verified explanations of individual requirements.
+- Recruiter agreement, time savings, demographic fairness, and performance on entirely new applicants have not been established.
+- Raw resume records, dataset caches, private review text, model weights, and credentials stay outside Git. Contact replacement is not complete anonymisation.
+- The dataset's licence and collection details remain unresolved; public availability alone does not establish reuse rights.
+
+The [performance record](m5/performance/README.md) distinguishes model/service benchmarks from browser and PDF/OCR work and records remaining hosted acceptance checks. The system remains a prototype requiring human review.
+
+## Team
+
+Pottabathini Vivekananda · Vikas Eranki · Manasa · Bhavani Shanker
+
+Newton School of Technology, Rishihood University
